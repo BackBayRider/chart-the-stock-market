@@ -5,6 +5,8 @@ import Chart from './Chart'
 
 import './theme/style.scss'
 
+const socket = io.connect('http://localhost:3000');
+
 class App extends React.Component {
 	constructor() {
 		super();
@@ -13,6 +15,7 @@ class App extends React.Component {
 			inputSymbol: '',
 			stocks: []
 		}
+
 		this.handleInput = this.handleInput.bind(this);
 		this.addStock = this.addStock.bind(this);
 		this.removeStock = this.removeStock.bind(this);
@@ -20,7 +23,7 @@ class App extends React.Component {
 	componentWillMount() {
 
 		// need to fetch all stocks from server/API on page load and save to component state
-		let socket = io.connect('http://localhost:3000');
+		//let socket = io.connect('http://localhost:3000');
 		
 		socket.emit('init');
 		socket.on('init-stock', (data) => {
@@ -34,7 +37,7 @@ class App extends React.Component {
 	}
 	componentDidMount() {
 
-		let socket = io.connect('http://localhost:3000');
+		//let socket = io.connect('http://localhost:3000');
 		
 		// listen for any stocks added by other clients and add them to local state
 		socket.on('stock-added', (data) => {
@@ -48,7 +51,6 @@ class App extends React.Component {
 		
 		// listen for any stocks removed by other clients and remove them from local state
 		socket.on('stock-removed', (symbol) => {
-			console.log(`${symbol} was removed`);
 			const { stocks } = this.state;
 			const updatedStocks = stocks.filter( (stock) => {
 				return stock.dataset.dataset_code !== symbol;
@@ -65,9 +67,9 @@ class App extends React.Component {
 		});
 	}
 	addStock() {
-		const { inputSymbol, stocks } = this.state;
-		let socket = io.connect('http://localhost:3000');
-		socket.emit('add', inputSymbol);
+		const { inputSymbol } = this.state;
+		//let socket = io.connect('http://localhost:3000');
+		if (inputSymbol !== '') { socket.emit('add', inputSymbol) }
 	}
 	removeStock(ticker, idx) {
 		// remove stock from local state
@@ -78,31 +80,35 @@ class App extends React.Component {
 			stocks: stocks
 		});
 		// dispatch action to server to remove stock from from databse and broadcast remove event to all listeners
-		let socket = io.connect('http://localhost:3000');
+		//let socket = io.connect('http://localhost:3000');
 		socket.emit('remove-stock', ticker);
 	}
 	render() {
 		const renderStocks = this.state.stocks.map( (stock, idx) => {
 			return (
 				<div key = {idx} className = 'stockContainer'>
-					<h3 className = 'stockTitle'>{stock.dataset.dataset_code}</h3>
+					<span className = 'stockTitle'>{stock.dataset.dataset_code}</span>
 					<i className = "fa fa-trash" aria-hidden="true" onClick = {this.removeStock.bind(this, stock.dataset.dataset_code, idx)}></i>
 				</div>
 			);
-		})
+		});
 		return (
-			<div>
-				<h1>Chart the Stock Market</h1>
-				<Chart />
+			<div className = 'main'>
+				<h1 className = 'title'>Chart the Stock Market</h1>
 				<div>
-					<p>Current Stocks</p>
 					<input
-						type="text"
+						type = "text"
+						className = 'search'
+						placeholder = 'Add a New Stock'
 						value = {this.state.inputSymbol}
-						onChange = {this.handleInput} />
-					<button onClick = {this.addStock}>Add a new stock</button>
+						onChange = {this.handleInput} /><br />
+					<button className = 'searchBtn' onClick = {this.addStock}>Add a new stock</button>
 				</div>
-				{renderStocks}
+				<Chart />
+				<h2>Current Stocks:</h2>
+				<div className = 'stocksWrapper'>
+					{renderStocks}
+				</div>
 			</div>
 		);
 	}

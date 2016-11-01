@@ -1,18 +1,67 @@
 body {
-	background: white;
-	color: blue;
+	background: #E7ECEF;
+	color: #272932;
 	text-align: center;
+	font-family: 'Lato', sans-serif;
 }
 
-.stockContainer {
-	width: 200px;
-	height: 125px;
-	margin: auto;
-	border: 1px solid white;
-	background: rgb(150,150,150,0.55);
-	font-size: 30px;
+.main {
+	.title {
+		margin-top: 25px;
+		font-size: 35px;
+	}
+	.search {
+		font-size: 22px;
+		width: 280px;
+		padding: 6px;
+	}
+	.searchBtn {
+		font-size: 24px;
+		padding: 5px 15px;
+		margin-top: 15px;
+		border: none;
+		background: #11B5E4;
+	}
+	.searchBtn:hover {
+		cursor: pointer;
+		background: #F9C22E;
+	}
 }
 
-.fa {
-	margin: 5px;
+.stocksWrapper {
+	width: 95vw;
+	margin: -15px auto 35px auto;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	.stockContainer {
+		font-size: 34px;
+		font-weight: bold;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 350px;
+		height: 65px;
+		margin: 15px;
+		border: 1px solid #1D1E2C;
+		border-radius: 1px;
+		background: rgba(150,150,150,0.55);
+		span {
+			margin-right: 25px;
+		}
+	}
+	.fa:hover {
+		color: #E01A4F;
+		cursor: pointer;
+	}
+}
+
+.chartWrapper {
+	width: 600px;
+	height: 450px;
+	margin: 15px auto;
+	border: 1px solid #1D1E2C;
+	border-radius: 3px;
+	background: rgba(150,150,150,0.15);
 }
