@@ -62,7 +62,15 @@
 
 	var _reactDom = __webpack_require__(35);
 
+	var _Chart = __webpack_require__(173);
+
+	var _Chart2 = _interopRequireDefault(_Chart);
+
+	__webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./theme/style.scss\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -76,29 +84,144 @@
 		function App() {
 			_classCallCheck(this, App);
 
-			return _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).apply(this, arguments));
+			var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this));
+
+			_this.state = {
+				inputSymbol: '',
+				stocks: []
+			};
+			_this.handleInput = _this.handleInput.bind(_this);
+			_this.addStock = _this.addStock.bind(_this);
+			_this.removeStock = _this.removeStock.bind(_this);
+			return _this;
 		}
 
 		_createClass(App, [{
 			key: 'componentWillMount',
 			value: function componentWillMount() {
+				var _this2 = this;
+
+				// need to fetch all stocks from server/API on page load and save to component state
 				var socket = io.connect('http://localhost:3000');
-				socket.on('news', function (data) {
-					console.log(data);
-					socket.emit('my other event', { my: 'data' });
+
+				socket.emit('init');
+				socket.on('init-stock', function (data) {
+					var stocks = _this2.state.stocks;
+
+					var updatedStocks = [].concat(_toConsumableArray(stocks), [data]);
+					_this2.setState({
+						stocks: updatedStocks
+					});
 				});
+			}
+		}, {
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+				var _this3 = this;
+
+				var socket = io.connect('http://localhost:3000');
+
+				// listen for any stocks added by other clients and add them to local state
+				socket.on('stock-added', function (data) {
+					console.log('Received new data:', data);
+					var stocks = _this3.state.stocks;
+
+					var updatedStocks = [].concat(_toConsumableArray(stocks), [data]);
+					_this3.setState({
+						stocks: updatedStocks
+					});
+				});
+
+				// listen for any stocks removed by other clients and remove them from local state
+				socket.on('stock-removed', function (symbol) {
+					console.log(symbol + ' was removed');
+					var stocks = _this3.state.stocks;
+
+					var updatedStocks = stocks.filter(function (stock) {
+						return stock.dataset.dataset_code !== symbol;
+					});
+					_this3.setState({
+						stocks: updatedStocks
+					});
+				});
+			}
+		}, {
+			key: 'handleInput',
+			value: function handleInput(e) {
+				this.setState({
+					inputSymbol: e.target.value
+				});
+			}
+		}, {
+			key: 'addStock',
+			value: function addStock() {
+				var _state = this.state,
+				    inputSymbol = _state.inputSymbol,
+				    stocks = _state.stocks;
+
+				var socket = io.connect('http://localhost:3000');
+				socket.emit('add', inputSymbol);
+			}
+		}, {
+			key: 'removeStock',
+			value: function removeStock(ticker, idx) {
+				// remove stock from local state
+				var stocks = this.state.stocks;
+
+				stocks.splice(idx, 1);
+
+				this.setState({
+					stocks: stocks
+				});
+				// dispatch action to server to remove stock from from databse and broadcast remove event to all listeners
+				var socket = io.connect('http://localhost:3000');
+				socket.emit('remove-stock', ticker);
 			}
 		}, {
 			key: 'render',
 			value: function render() {
+				var _this4 = this;
+
+				var renderStocks = this.state.stocks.map(function (stock, idx) {
+					return _react2.default.createElement(
+						'div',
+						{ key: idx, className: 'stockContainer' },
+						_react2.default.createElement(
+							'h3',
+							{ className: 'stockTitle' },
+							stock.dataset.dataset_code
+						),
+						_react2.default.createElement('i', { className: 'fa fa-trash', 'aria-hidden': 'true', onClick: _this4.removeStock.bind(_this4, stock.dataset.dataset_code, idx) })
+					);
+				});
 				return _react2.default.createElement(
 					'div',
 					null,
 					_react2.default.createElement(
 						'h1',
 						null,
-						'HELLO FROM webpack'
-					)
+						'Chart the Stock Market'
+					),
+					_react2.default.createElement(_Chart2.default, null),
+					_react2.default.createElement(
+						'div',
+						null,
+						_react2.default.createElement(
+							'p',
+							null,
+							'Current Stocks'
+						),
+						_react2.default.createElement('input', {
+							type: 'text',
+							value: this.state.inputSymbol,
+							onChange: this.handleInput }),
+						_react2.default.createElement(
+							'button',
+							{ onClick: this.addStock },
+							'Add a new stock'
+						)
+					),
+					renderStocks
 				);
 			}
 		}]);
@@ -21476,6 +21599,61 @@
 
 	module.exports = ReactDOMNullInputValuePropHook;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+
+/***/ },
+/* 173 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Chart = function (_React$Component) {
+		_inherits(Chart, _React$Component);
+
+		function Chart() {
+			_classCallCheck(this, Chart);
+
+			return _possibleConstructorReturn(this, (Chart.__proto__ || Object.getPrototypeOf(Chart)).apply(this, arguments));
+		}
+
+		_createClass(Chart, [{
+			key: 'render',
+			value: function render() {
+				return _react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement(
+						'h1',
+						null,
+						'This is the Chart Component'
+					)
+				);
+			}
+		}]);
+
+		return Chart;
+	}(_react2.default.Component);
+
+	;
+
+	exports.default = Chart;
 
 /***/ }
 /******/ ]);

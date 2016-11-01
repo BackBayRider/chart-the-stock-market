@@ -11,6 +11,10 @@ module.exports = {
 					test: /\.js$/,
 					exclude: /node_modules/,
 					loaders: ['babel']
+			},
+			{
+					test: /\.scss$/,
+					loaders: ['sass-loader']
 			}
 		]
 	},
