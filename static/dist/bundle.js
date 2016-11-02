@@ -90,7 +90,9 @@
 
 			_this.state = {
 				inputSymbol: '',
-				stocks: []
+				stocks: [],
+				loading: true,
+				initialLoad: true
 			};
 
 			_this.handleInput = _this.handleInput.bind(_this);
@@ -105,9 +107,12 @@
 				var _this2 = this;
 
 				// need to fetch all stocks from server/API on page load and save to component state
-				//let socket = io.connect('http://localhost:3000');
-
 				socket.emit('init');
+				socket.on('inform-length', function (num) {
+					_this2.setState({
+						dataLength: num
+					});
+				});
 				socket.on('init-stock', function (data) {
 					var stocks = _this2.state.stocks;
 
@@ -115,14 +120,19 @@
 					_this2.setState({
 						stocks: updatedStocks
 					});
+					if (updatedStocks.length === _this2.state.dataLength) {
+						_this2.setState({
+							loading: false,
+							initialLoad: false,
+							inputSymbol: ''
+						});
+					}
 				});
 			}
 		}, {
 			key: 'componentDidMount',
 			value: function componentDidMount() {
 				var _this3 = this;
-
-				//let socket = io.connect('http://localhost:3000');
 
 				// listen for any stocks added by other clients and add them to local state
 				socket.on('stock-added', function (data) {
@@ -131,7 +141,16 @@
 
 					var updatedStocks = [].concat(_toConsumableArray(stocks), [data]);
 					_this3.setState({
-						stocks: updatedStocks
+						stocks: updatedStocks,
+						loading: false
+					});
+				});
+
+				// catch error if api return 404 for stock symbol
+				socket.on('lookup-error', function (message) {
+					alert(message);
+					_this3.setState({
+						loading: false
 					});
 				});
 
@@ -157,27 +176,57 @@
 		}, {
 			key: 'addStock',
 			value: function addStock() {
-				var inputSymbol = this.state.inputSymbol;
-				//let socket = io.connect('http://localhost:3000');
+				var _state = this.state,
+				    stocks = _state.stocks,
+				    inputSymbol = _state.inputSymbol;
 
-				if (inputSymbol !== '') {
-					socket.emit('add', inputSymbol);
+				var ticker = inputSymbol.trim();
+				// make sure initla date is finished loading
+				if (!this.state.initialLoad) {
+					// make sure user input is not empty
+					if (inputSymbol !== '') {
+						var preventDuplicate = function preventDuplicate(ticker) {
+							for (var i = 0; i < stocks.length; i++) {
+								if (stocks[i].dataset.dataset_code === ticker) {
+									return true;
+								}
+							}
+							return false;
+						};
+						// make sure stock symbol is not already listed
+
+
+						if (preventDuplicate(ticker)) {
+							alert('This stock is already listed!');
+							this.setState({
+								inputSymbol: ''
+							});
+							// dispatch add action through socket.io
+						} else {
+							socket.emit('add', ticker);
+							this.setState({
+								inputSymbol: '',
+								loading: true
+							});
+						}
+					}
 				}
 			}
 		}, {
 			key: 'removeStock',
 			value: function removeStock(ticker, idx) {
-				// remove stock from local state
-				var stocks = this.state.stocks;
+				if (!this.state.initialLoad) {
+					// remove stock from local state
+					var stocks = this.state.stocks;
 
-				stocks.splice(idx, 1);
+					stocks.splice(idx, 1);
 
-				this.setState({
-					stocks: stocks
-				});
-				// dispatch action to server to remove stock from from databse and broadcast remove event to all listeners
-				//let socket = io.connect('http://localhost:3000');
-				socket.emit('remove-stock', ticker);
+					this.setState({
+						stocks: stocks
+					});
+					// dispatch action to server to remove stock from from databse and broadcast remove event to all listeners
+					socket.emit('remove-stock', ticker);
+				}
 			}
 		}, {
 			key: 'render',
@@ -187,13 +236,13 @@
 				var renderStocks = this.state.stocks.map(function (stock, idx) {
 					return _react2.default.createElement(
 						'div',
-						{ key: idx, className: 'stockContainer' },
+						{ key: idx, className: 'stockContainer', onClick: _this4.removeStock.bind(_this4, stock.dataset.dataset_code, idx) },
 						_react2.default.createElement(
 							'span',
 							{ className: 'stockTitle' },
 							stock.dataset.dataset_code
 						),
-						_react2.default.createElement('i', { className: 'fa fa-trash', 'aria-hidden': 'true', onClick: _this4.removeStock.bind(_this4, stock.dataset.dataset_code, idx) })
+						_react2.default.createElement('i', { className: 'fa fa-trash', 'aria-hidden': 'true' })
 					);
 				});
 				return _react2.default.createElement(
@@ -218,13 +267,18 @@
 							'button',
 							{ className: 'searchBtn', onClick: this.addStock },
 							'Add a new stock'
+						),
+						this.state.loading && _react2.default.createElement(
+							'p',
+							{ className: 'loadingMsg' },
+							'Loading Data...'
 						)
 					),
 					_react2.default.createElement(_Chart2.default, null),
 					_react2.default.createElement(
 						'h2',
-						null,
-						'Current Stocks:'
+						{ className: 'currentStocksTitle' },
+						'Current Stocks (click to remove):'
 					),
 					_react2.default.createElement(
 						'div',
@@ -21699,7 +21753,7 @@
 
 
 	// module
-	exports.push([module.id, "body {\n  background: #E7ECEF;\n  color: #272932;\n  text-align: center;\n  font-family: 'Lato', sans-serif; }\n\n.main .title {\n  margin-top: 25px;\n  font-size: 35px; }\n\n.main .search {\n  font-size: 22px;\n  width: 280px;\n  padding: 6px; }\n\n.main .searchBtn {\n  font-size: 24px;\n  padding: 5px 15px;\n  margin-top: 15px;\n  border: none;\n  background: #11B5E4; }\n\n.main .searchBtn:hover {\n  cursor: pointer;\n  background: #F9C22E; }\n\n.stocksWrapper {\n  width: 95vw;\n  margin: -15px auto 35px auto;\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n  justify-content: center; }\n  .stocksWrapper .stockContainer {\n    font-size: 34px;\n    font-weight: bold;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    width: 350px;\n    height: 65px;\n    margin: 15px;\n    border: 1px solid #1D1E2C;\n    border-radius: 1px;\n    background: rgba(150, 150, 150, 0.55); }\n    .stocksWrapper .stockContainer span {\n      margin-right: 25px; }\n  .stocksWrapper .fa:hover {\n    color: #E01A4F;\n    cursor: pointer; }\n\n.chartWrapper {\n  width: 600px;\n  height: 450px;\n  margin: 15px auto;\n  border: 1px solid #1D1E2C;\n  border-radius: 3px;\n  background: rgba(150, 150, 150, 0.15); }\n", ""]);
+	exports.push([module.id, "body {\n  background: #E7ECEF;\n  color: #272932;\n  text-align: center;\n  font-family: 'Lato', sans-serif; }\n\n.main .title {\n  margin-top: 25px;\n  font-size: 35px; }\n\n.main .search {\n  font-size: 22px;\n  width: 280px;\n  padding: 6px; }\n\n.main .searchBtn {\n  font-size: 24px;\n  padding: 5px 15px;\n  margin-top: 15px;\n  border: none;\n  background: #11B5E4; }\n\n.main .searchBtn:hover {\n  cursor: pointer;\n  background: #F9C22E; }\n\n.main .loadingMsg {\n  font-size: 20px;\n  color: #FF5F3D; }\n\n.stocksWrapper {\n  width: 95vw;\n  margin: -15px auto 35px auto;\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n  justify-content: center; }\n  .stocksWrapper .stockContainer {\n    font-size: 34px;\n    font-weight: bold;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    width: 350px;\n    height: 65px;\n    margin: 15px;\n    border: 1px solid #1D1E2C;\n    border-radius: 1px;\n    background: rgba(150, 150, 150, 0.55); }\n    .stocksWrapper .stockContainer span {\n      margin-right: 25px; }\n  .stocksWrapper .stockContainer:hover {\n    background: #FF5F3D;\n    cursor: pointer; }\n\n.chartWrapper {\n  width: 600px;\n  height: 450px;\n  margin: 15px auto;\n  border: 1px solid #1D1E2C;\n  border-radius: 3px;\n  background: rgba(150, 150, 150, 0.15); }\n\n@media screen and (max-width: 600px) {\n  .main .title {\n    margin-top: 20px;\n    font-size: 28px; }\n  .main .currentStocksTitle {\n    font-size: 22px;\n    margin-bottom: 35px; }\n  .stocksWrapper {\n    width: 95vw;\n    margin: -15px auto 35px auto; }\n    .stocksWrapper .stockContainer {\n      font-size: 28px;\n      width: 285px;\n      height: 55px;\n      margin: 10px; }\n      .stocksWrapper .stockContainer span {\n        margin-right: 20px; } }\n", ""]);
 
 	// exports
 

@@ -13,7 +13,9 @@ class App extends React.Component {
 
 		this.state = {
 			inputSymbol: '',
-			stocks: []
+			stocks: [],
+			loading: true,
+			initialLoad: true
 		}
 
 		this.handleInput = this.handleInput.bind(this);
@@ -23,21 +25,29 @@ class App extends React.Component {
 	componentWillMount() {
 
 		// need to fetch all stocks from server/API on page load and save to component state
-		//let socket = io.connect('http://localhost:3000');
-		
 		socket.emit('init');
+		socket.on('inform-length', (num) => {
+			this.setState({
+				dataLength: num
+			});
+		});
 		socket.on('init-stock', (data) => {
 			const { stocks } = this.state;
 			const updatedStocks = [...stocks, data];
 			this.setState({
 				stocks: updatedStocks
 			});
+			if (updatedStocks.length === this.state.dataLength) {
+				this.setState({
+					loading: false,
+					initialLoad: false,
+					inputSymbol: ''
+				});
+			}
 		});
 
 	}
 	componentDidMount() {
-
-		//let socket = io.connect('http://localhost:3000');
 		
 		// listen for any stocks added by other clients and add them to local state
 		socket.on('stock-added', (data) => {
@@ -45,7 +55,16 @@ class App extends React.Component {
 			const { stocks } = this.state;
 			const updatedStocks = [...stocks, data];
 			this.setState({
-				stocks: updatedStocks
+				stocks: updatedStocks,
+				loading: false
+			});
+		});
+
+		// catch error if api return 404 for stock symbol
+		socket.on('lookup-error', (message) => {
+			alert(message);
+			this.setState({
+				loading: false
 			});
 		});
 		
@@ -67,28 +86,56 @@ class App extends React.Component {
 		});
 	}
 	addStock() {
-		const { inputSymbol } = this.state;
-		//let socket = io.connect('http://localhost:3000');
-		if (inputSymbol !== '') { socket.emit('add', inputSymbol) }
+		const { stocks, inputSymbol } = this.state;
+		const ticker = inputSymbol.trim();
+		// make sure initla date is finished loading
+		if (!this.state.initialLoad) {
+			// make sure user input is not empty
+			if (inputSymbol !== '') {
+				function preventDuplicate(ticker) {
+					for (let i = 0; i < stocks.length; i++) {
+						if (stocks[i].dataset.dataset_code === ticker) {
+							return true;
+						}
+					}
+					return false;
+				}
+				// make sure stock symbol is not already listed
+				if (preventDuplicate(ticker)) {
+					alert('This stock is already listed!');
+					this.setState({
+						inputSymbol: ''
+					});
+					// dispatch add action through socket.io
+				} else {
+					socket.emit('add', ticker);
+					this.setState({
+						inputSymbol: '',
+						loading: true
+					});
+				}
+			}
+		}
 	}
 	removeStock(ticker, idx) {
-		// remove stock from local state
-		const { stocks } = this.state;
-		stocks.splice(idx, 1);
+		if (!this.state.initialLoad) {
+			// remove stock from local state
+			const { stocks } = this.state;
+			stocks.splice(idx, 1);
 
-		this.setState({
-			stocks: stocks
-		});
-		// dispatch action to server to remove stock from from databse and broadcast remove event to all listeners
-		//let socket = io.connect('http://localhost:3000');
-		socket.emit('remove-stock', ticker);
+			this.setState({
+				stocks: stocks
+			});
+			// dispatch action to server to remove stock from from databse and broadcast remove event to all listeners
+			socket.emit('remove-stock', ticker);
+		}
 	}
 	render() {
 		const renderStocks = this.state.stocks.map( (stock, idx) => {
 			return (
-				<div key = {idx} className = 'stockContainer'>
+				<div key = {idx} className = 'stockContainer' onClick = {this.removeStock.bind(this, stock.dataset.dataset_code, idx)}>
 					<span className = 'stockTitle'>{stock.dataset.dataset_code}</span>
-					<i className = "fa fa-trash" aria-hidden="true" onClick = {this.removeStock.bind(this, stock.dataset.dataset_code, idx)}></i>
+					<i className = "fa fa-trash" aria-hidden="true"></i>
 				</div>
 			);
 		});
@@ -103,9 +150,10 @@ class App extends React.Component {
 						value = {this.state.inputSymbol}
 						onChange = {this.handleInput} /><br />
 					<button className = 'searchBtn' onClick = {this.addStock}>Add a new stock</button>
+					{ this.state.loading && <p className = 'loadingMsg'>Loading Data...</p> }
 				</div>
 				<Chart />
-				<h2>Current Stocks:</h2>
+				<h2 className = 'currentStocksTitle'>Current Stocks (click to remove):</h2>
 				<div className = 'stocksWrapper'>
 					{renderStocks}
 				</div>

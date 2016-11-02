@@ -26,6 +26,10 @@ body {
 		cursor: pointer;
 		background: #F9C22E;
 	}
+	.loadingMsg {
+		font-size: 20px;
+		color: #FF5F3D;
+	}
 }
 
 .stocksWrapper {
@@ -51,8 +55,8 @@ body {
 			margin-right: 25px;
 		}
 	}
-	.fa:hover {
-		color: #E01A4F;
+	.stockContainer:hover {
+		background: #FF5F3D;
 		cursor: pointer;
 	}
 }
@@ -64,4 +68,31 @@ body {
 	border: 1px solid #1D1E2C;
 	border-radius: 3px;
 	background: rgba(150,150,150,0.15);
+}
+
+@media screen and (max-width: 600px) {
+	.main {
+		.title {
+			margin-top: 20px;
+			font-size: 28px;
+		}
+		.currentStocksTitle {
+			font-size: 22px;
+			margin-bottom: 35px;
+		}	
+	}
+
+	.stocksWrapper {
+		width: 95vw;
+		margin: -15px auto 35px auto;
+		.stockContainer {
+			font-size: 28px;
+			width: 285px;
+			height: 55px;
+			margin: 10px;
+			span {
+				margin-right: 20px;
+			}
+		}
+	}
 }

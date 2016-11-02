@@ -42,6 +42,7 @@ io.on('connection', (socket) => {
 			db.collection('stocks').find().toArray( (error, response) => {
 				if (!err) {
 					let data = [];
+					socket.emit('inform-length', response.length);
 					for (let i = 0; i < response.length; i++) { data[i] = response[i].symbol }
 					// map over the data from the stocks collection and return each to clients through socket.io
 					data.map( (ticker) => {
@@ -62,6 +63,7 @@ io.on('connection', (socket) => {
 
 		axios.get('https://www.quandl.com/api/v3/datasets/WIKI/' + stock + '.json?api_key=' + process.env.QUANDL_KEY).then( (response) => {
 			// receive data, emit response to all listeners with symbol and data for update
+			socket.emit('stock-added', response.data);
 			socket.broadcast.emit('stock-added', response.data);
 
 			// insert stock into database
@@ -71,7 +73,10 @@ io.on('connection', (socket) => {
 				db.collection('stocks').insertOne({ symbol: stock });
 				db.close();
 			});
-		}).catch(err => console.log(err));
+		}).catch( (err) => {
+			console.log(err);
+			socket.emit('lookup-error', 'This symbol could not be found!');
+		});
 	});
 
 	socket.on('remove-stock', (symbol) => {
@@ -84,6 +89,7 @@ io.on('connection', (socket) => {
 					justOne: true
 				}
 			);
+			socket.broadcast.emit('stock-removed', symbol);
 			socket.emit('stock-removed', symbol);
 		});
 	});
