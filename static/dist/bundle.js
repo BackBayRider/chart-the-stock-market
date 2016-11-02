@@ -95,6 +95,7 @@
 				initialLoad: true
 			};
 
+			_this.handleKeyPress = _this.handleKeyPress.bind(_this);
 			_this.handleInput = _this.handleInput.bind(_this);
 			_this.addStock = _this.addStock.bind(_this);
 			_this.removeStock = _this.removeStock.bind(_this);
@@ -105,6 +106,8 @@
 			key: 'componentWillMount',
 			value: function componentWillMount() {
 				var _this2 = this;
+
+				window.addEventListener('keypress', this.handleKeyPress);
 
 				// need to fetch all stocks from server/API on page load and save to component state
 				socket.emit('init');
@@ -167,6 +170,13 @@
 				});
 			}
 		}, {
+			key: 'handleKeyPress',
+			value: function handleKeyPress(e) {
+				if (e.keyCode === 13) {
+					this.addStock();
+				}
+			}
+		}, {
 			key: 'handleInput',
 			value: function handleInput(e) {
 				this.setState({
@@ -180,7 +190,7 @@
 				    stocks = _state.stocks,
 				    inputSymbol = _state.inputSymbol;
 
-				var ticker = inputSymbol.trim();
+				var ticker = inputSymbol.trim().toUpperCase();
 				// make sure initla date is finished loading
 				if (!this.state.initialLoad) {
 					// make sure user input is not empty
@@ -252,6 +262,15 @@
 						'h1',
 						{ className: 'title' },
 						'Chart the Stock Market'
+					),
+					_react2.default.createElement(
+						'p',
+						{ className: 'twitterLink' },
+						_react2.default.createElement(
+							'a',
+							{ target: '_blank', href: 'https://twitter.com/bonham_000' },
+							'@bonham000'
+						)
 					),
 					_react2.default.createElement(
 						'div',
@@ -21753,7 +21772,7 @@
 
 
 	// module
-	exports.push([module.id, "body {\n  background: #E7ECEF;\n  color: #272932;\n  text-align: center;\n  font-family: 'Lato', sans-serif; }\n\n.main .title {\n  margin-top: 25px;\n  font-size: 35px; }\n\n.main .search {\n  font-size: 22px;\n  width: 280px;\n  padding: 6px; }\n\n.main .searchBtn {\n  font-size: 24px;\n  padding: 5px 15px;\n  margin-top: 15px;\n  border: none;\n  background: #11B5E4; }\n\n.main .searchBtn:hover {\n  cursor: pointer;\n  background: #F9C22E; }\n\n.main .loadingMsg {\n  font-size: 20px;\n  color: #FF5F3D; }\n\n.stocksWrapper {\n  width: 95vw;\n  margin: -15px auto 35px auto;\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n  justify-content: center; }\n  .stocksWrapper .stockContainer {\n    font-size: 34px;\n    font-weight: bold;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    width: 350px;\n    height: 65px;\n    margin: 15px;\n    border: 1px solid #1D1E2C;\n    border-radius: 1px;\n    background: rgba(150, 150, 150, 0.55); }\n    .stocksWrapper .stockContainer span {\n      margin-right: 25px; }\n  .stocksWrapper .stockContainer:hover {\n    background: #FF5F3D;\n    cursor: pointer; }\n\n.chartWrapper {\n  width: 600px;\n  height: 450px;\n  margin: 15px auto;\n  border: 1px solid #1D1E2C;\n  border-radius: 3px;\n  background: rgba(150, 150, 150, 0.15); }\n\n@media screen and (max-width: 600px) {\n  .main .title {\n    margin-top: 20px;\n    font-size: 28px; }\n  .main .currentStocksTitle {\n    font-size: 22px;\n    margin-bottom: 35px; }\n  .stocksWrapper {\n    width: 95vw;\n    margin: -15px auto 35px auto; }\n    .stocksWrapper .stockContainer {\n      font-size: 28px;\n      width: 285px;\n      height: 55px;\n      margin: 10px; }\n      .stocksWrapper .stockContainer span {\n        margin-right: 20px; } }\n", ""]);
+	exports.push([module.id, "body {\n  background: #E7ECEF;\n  color: #272932;\n  text-align: center;\n  font-family: 'Lato', sans-serif; }\n\n.main .title {\n  margin-top: 25px;\n  font-size: 35px; }\n\n.main .twitterLink {\n  margin-top: -12px;\n  margin-bottom: 20px;\n  font-size: 16px; }\n  .main .twitterLink a, .main .twitterLink a:visited {\n    color: #122369; }\n  .main .twitterLink a:hover {\n    color: #FF4A81; }\n\n.main .search {\n  font-size: 22px;\n  width: 280px;\n  padding: 6px; }\n\n.main .searchBtn {\n  font-size: 24px;\n  padding: 5px 15px;\n  margin-top: 15px;\n  border: none;\n  background: #11B5E4; }\n\n.main .searchBtn:hover {\n  cursor: pointer;\n  background: #F9C22E; }\n\n.main .loadingMsg {\n  font-size: 20px;\n  color: #FF5F3D; }\n\n.stocksWrapper {\n  width: 95vw;\n  margin: -15px auto 35px auto;\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n  justify-content: center; }\n  .stocksWrapper .stockContainer {\n    font-size: 34px;\n    font-weight: bold;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    width: 350px;\n    height: 65px;\n    margin: 15px;\n    border: 1px solid #1D1E2C;\n    border-radius: 1px;\n    background: rgba(150, 150, 150, 0.55); }\n    .stocksWrapper .stockContainer span {\n      margin-right: 25px; }\n  .stocksWrapper .stockContainer:hover {\n    background: #F74961;\n    cursor: pointer; }\n\n.chartWrapper {\n  width: 600px;\n  height: 450px;\n  margin: 15px auto;\n  border: 1px solid #1D1E2C;\n  border-radius: 3px;\n  background: rgba(150, 150, 150, 0.15); }\n\n@media screen and (max-width: 600px) {\n  .main .title {\n    margin-top: 20px;\n    font-size: 28px; }\n  .main .currentStocksTitle {\n    font-size: 22px;\n    margin-bottom: 35px; }\n  .stocksWrapper {\n    width: 95vw;\n    margin: -15px auto 35px auto; }\n    .stocksWrapper .stockContainer {\n      font-size: 28px;\n      width: 285px;\n      height: 55px;\n      margin: 10px; }\n      .stocksWrapper .stockContainer span {\n        margin-right: 20px; } }\n", ""]);
 
 	// exports
 

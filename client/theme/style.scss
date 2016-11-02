@@ -10,6 +10,17 @@ body {
 		margin-top: 25px;
 		font-size: 35px;
 	}
+	.twitterLink {
+		margin-top: -12px;
+		margin-bottom: 20px;
+		font-size: 16px;
+		a, a:visited {
+			color: #122369;
+		}
+		a:hover {
+			color: #FF4A81;
+		}
+	}
 	.search {
 		font-size: 22px;
 		width: 280px;
@@ -56,7 +67,7 @@ body {
 		}
 	}
 	.stockContainer:hover {
-		background: #FF5F3D;
+		background: #F74961;
 		cursor: pointer;
 	}
 }
