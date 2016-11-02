@@ -10,7 +10,9 @@ class Search extends React.Component {
 					placeholder = 'Add a New Stock'
 					value = {this.props.inputSymbol}
 					onChange = {this.props.handleInput} /><br />
-				<button className = 'searchBtn' onClick = {this.props.addStock}>Add a new stock</button>
+				<button className = 'searchBtn' onClick = {this.props.addStock}>
+					Add a new stock
+				</button>
 			</div>
 		);
 	}

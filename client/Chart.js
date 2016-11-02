@@ -4,6 +4,8 @@ import ReactHighCharts from 'react-highcharts'
 
 class Chart extends React.Component {
 	shouldComponentUpdate(nextProps, nextState) {
+		// controls re-render of highcharts component
+		// re-render only if new stock data is present
 		if (nextProps.initStatus !== this.props.initStatus) {
 			return true;
 		}
@@ -15,6 +17,7 @@ class Chart extends React.Component {
 		}
 	}
 	render() {
+		// modify props data to highcharts data format
 		let chartData = this.props.stockData.map( (stock) => {
 			return {
 				name: stock.dataset.dataset_code,
@@ -29,12 +32,13 @@ class Chart extends React.Component {
 				data: stock.data.slice(0, 1000).reverse()
 			}
 		})
+		// highcharts config
 		let config = {
 			  rangeSelector: {
 			    selected: 1
 			  },
 			  title: {
-			    text: 'Stock Prices'
+			    text: 'Stock Prices over the last 1,000 days'
 			  },
         plotOptions: {
             series: {

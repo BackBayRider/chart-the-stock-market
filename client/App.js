@@ -1,6 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 
+import About from './About'
 import Search from './Search'
 import Chart from './Chart'
 
@@ -13,16 +14,19 @@ class App extends React.Component {
 		super();
 
 		this.state = {
+			dataLength: 0,
 			inputSymbol: '',
 			stocks: [],
 			loading: true,
-			initialLoad: true
+			initialLoad: true,
+			showInfo: false
 		}
 
 		this.handleKeyPress = this.handleKeyPress.bind(this);
 		this.handleInput = this.handleInput.bind(this);
 		this.addStock = this.addStock.bind(this);
 		this.removeStock = this.removeStock.bind(this);
+		this.toggleInfo = this.toggleInfo.bind(this);
 
 	}
 	componentWillMount() {
@@ -137,7 +141,9 @@ class App extends React.Component {
 			socket.emit('remove-stock', ticker);
 		}
 	}
+	toggleInfo() { this.setState({ showInfo: !this.state.showInfo }) }
 	render() {
+		// list of current stocks to be displayed on page
 		const renderStocks = this.state.stocks.map( (stock, idx) => {
 			return (
 				<div key = {idx} className = 'stockContainer' onClick = {this.removeStock.bind(this, stock.dataset.dataset_code, idx)}>
@@ -148,20 +154,35 @@ class App extends React.Component {
 		});
 		const { stocks } = this.state;
 		return (
-			<div className = 'main'>
-				<h1 className = 'title'>Chart the Stock Market</h1>
-				<p className = 'twitterLink'>
-					<a target = "_blank" href="https://twitter.com/bonham_000">@bonham000</a>
-				</p>
-				<Search
-					inputSymbol = {this.state.inputSymbol} 
-					handleInput = {this.handleInput}
-					addStock = {this.addStock} />
-				{ this.state.loading && <p className = 'loadingMsg'>Please wait, the data is loading...</p> }
-				<Chart stockData = {stocks} initStatus = {this.state.initialLoad} />
-				<h2 className = 'currentStocksTitle'>Current Stocks (click to remove):</h2>
-				<div className = 'stocksWrapper'>
-					{renderStocks}
+			<div>
+				{ this.state.showInfo && <About toggleInfo = {this.toggleInfo} /> }
+				<div className = 'main'>
+					
+					<h1 className = 'title'>Chart the Stock Market</h1>
+
+					<p className = 'info twitterLink'><a target = "_blank" href="https://twitter.com/bonham_000">@bonham000</a></p>
+					<p className = 'info aboutLink'><a onClick = {this.toggleInfo}>About</a></p>
+
+					<Search
+						inputSymbol = {this.state.inputSymbol} 
+						handleInput = {this.handleInput}
+						addStock = {this.addStock} />
+
+					{ this.state.loading && this.state.initialLoad && this.state.dataLength !== 0 &&
+						<p className = 'loadingMsg'>Please wait, currently loading {this.state.stocks.length + 1} of {this.state.dataLength} stocks</p> }
+					
+					{ this.state.loading && !this.state.initialLoad &&
+						<p className = 'loadingMsg'>Please wait, the data is loading...</p> }
+
+					<div className = 'flexWrapper'>
+						<div className =  'stocksComponent'>
+							<div className = 'stocksWrapper'>
+								{renderStocks}
+							</div>
+						</div>
+						<Chart className = 'chartComponent' stockData = {stocks} initStatus = {this.state.initialLoad} />
+					</div>
+
 				</div>
 			</div>
 		);

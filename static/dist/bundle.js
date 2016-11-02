@@ -62,11 +62,15 @@
 
 	var _reactDom = __webpack_require__(35);
 
-	var _Search = __webpack_require__(186);
+	var _About = __webpack_require__(181);
+
+	var _About2 = _interopRequireDefault(_About);
+
+	var _Search = __webpack_require__(173);
 
 	var _Search2 = _interopRequireDefault(_Search);
 
-	var _Chart = __webpack_require__(173);
+	var _Chart = __webpack_require__(174);
 
 	var _Chart2 = _interopRequireDefault(_Chart);
 
@@ -93,16 +97,19 @@
 			var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this));
 
 			_this.state = {
+				dataLength: 0,
 				inputSymbol: '',
 				stocks: [],
 				loading: true,
-				initialLoad: true
+				initialLoad: true,
+				showInfo: false
 			};
 
 			_this.handleKeyPress = _this.handleKeyPress.bind(_this);
 			_this.handleInput = _this.handleInput.bind(_this);
 			_this.addStock = _this.addStock.bind(_this);
 			_this.removeStock = _this.removeStock.bind(_this);
+			_this.toggleInfo = _this.toggleInfo.bind(_this);
 
 			return _this;
 		}
@@ -244,10 +251,16 @@
 				}
 			}
 		}, {
+			key: 'toggleInfo',
+			value: function toggleInfo() {
+				this.setState({ showInfo: !this.state.showInfo });
+			}
+		}, {
 			key: 'render',
 			value: function render() {
 				var _this4 = this;
 
+				// list of current stocks to be displayed on page
 				var renderStocks = this.state.stocks.map(function (stock, idx) {
 					return _react2.default.createElement(
 						'div',
@@ -264,40 +277,66 @@
 
 				return _react2.default.createElement(
 					'div',
-					{ className: 'main' },
-					_react2.default.createElement(
-						'h1',
-						{ className: 'title' },
-						'Chart the Stock Market'
-					),
-					_react2.default.createElement(
-						'p',
-						{ className: 'twitterLink' },
-						_react2.default.createElement(
-							'a',
-							{ target: '_blank', href: 'https://twitter.com/bonham_000' },
-							'@bonham000'
-						)
-					),
-					_react2.default.createElement(_Search2.default, {
-						inputSymbol: this.state.inputSymbol,
-						handleInput: this.handleInput,
-						addStock: this.addStock }),
-					this.state.loading && _react2.default.createElement(
-						'p',
-						{ className: 'loadingMsg' },
-						'Please wait, the data is loading...'
-					),
-					_react2.default.createElement(_Chart2.default, { stockData: stocks, initStatus: this.state.initialLoad }),
-					_react2.default.createElement(
-						'h2',
-						{ className: 'currentStocksTitle' },
-						'Current Stocks (click to remove):'
-					),
+					null,
+					this.state.showInfo && _react2.default.createElement(_About2.default, { toggleInfo: this.toggleInfo }),
 					_react2.default.createElement(
 						'div',
-						{ className: 'stocksWrapper' },
-						renderStocks
+						{ className: 'main' },
+						_react2.default.createElement(
+							'h1',
+							{ className: 'title' },
+							'Chart the Stock Market'
+						),
+						_react2.default.createElement(
+							'p',
+							{ className: 'info twitterLink' },
+							_react2.default.createElement(
+								'a',
+								{ target: '_blank', href: 'https://twitter.com/bonham_000' },
+								'@bonham000'
+							)
+						),
+						_react2.default.createElement(
+							'p',
+							{ className: 'info aboutLink' },
+							_react2.default.createElement(
+								'a',
+								{ onClick: this.toggleInfo },
+								'About'
+							)
+						),
+						_react2.default.createElement(_Search2.default, {
+							inputSymbol: this.state.inputSymbol,
+							handleInput: this.handleInput,
+							addStock: this.addStock }),
+						this.state.loading && this.state.initialLoad && this.state.dataLength !== 0 && _react2.default.createElement(
+							'p',
+							{ className: 'loadingMsg' },
+							'Please wait, currently loading ',
+							this.state.stocks.length + 1,
+							' of ',
+							this.state.dataLength,
+							' stocks'
+						),
+						this.state.loading && !this.state.initialLoad && _react2.default.createElement(
+							'p',
+							{ className: 'loadingMsg' },
+							'Please wait, the data is loading...'
+						),
+						_react2.default.createElement(
+							'div',
+							{ className: 'flexWrapper' },
+							_react2.default.createElement(
+								'div',
+								{ className: 'stocksComponent' },
+								_react2.default.createElement(
+									'div',
+									{ className: 'stocksWrapper' },
+									renderStocks
+								)
+							),
+							_react2.default.createElement(_Chart2.default, { className: 'chartComponent', stockData: stocks, initStatus: this.state.initialLoad })
+						)
 					)
 				);
 			}
@@ -21693,11 +21732,73 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _highcharts = __webpack_require__(181);
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Search = function (_React$Component) {
+		_inherits(Search, _React$Component);
+
+		function Search() {
+			_classCallCheck(this, Search);
+
+			return _possibleConstructorReturn(this, (Search.__proto__ || Object.getPrototypeOf(Search)).apply(this, arguments));
+		}
+
+		_createClass(Search, [{
+			key: 'render',
+			value: function render() {
+				return _react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement('input', {
+						type: 'text',
+						className: 'search',
+						placeholder: 'Add a New Stock',
+						value: this.props.inputSymbol,
+						onChange: this.props.handleInput }),
+					_react2.default.createElement('br', null),
+					_react2.default.createElement(
+						'button',
+						{ className: 'searchBtn', onClick: this.props.addStock },
+						'Add a new stock'
+					)
+				);
+			}
+		}]);
+
+		return Search;
+	}(_react2.default.Component);
+
+	;
+
+	exports.default = Search;
+
+/***/ },
+/* 174 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _highcharts = __webpack_require__(175);
 
 	var _highcharts2 = _interopRequireDefault(_highcharts);
 
-	var _reactHighcharts = __webpack_require__(182);
+	var _reactHighcharts = __webpack_require__(176);
 
 	var _reactHighcharts2 = _interopRequireDefault(_reactHighcharts);
 
@@ -21721,6 +21822,8 @@
 		_createClass(Chart, [{
 			key: 'shouldComponentUpdate',
 			value: function shouldComponentUpdate(nextProps, nextState) {
+				// controls re-render of highcharts component
+				// re-render only if new stock data is present
 				if (nextProps.initStatus !== this.props.initStatus) {
 					return true;
 				} else if (nextProps.stockData.length === this.props.stockData.length) {
@@ -21732,6 +21835,7 @@
 		}, {
 			key: 'render',
 			value: function render() {
+				// modify props data to highcharts data format
 				var chartData = this.props.stockData.map(function (stock) {
 					return {
 						name: stock.dataset.dataset_code,
@@ -21746,12 +21850,13 @@
 						data: stock.data.slice(0, 1000).reverse()
 					};
 				});
+				// highcharts config
 				var config = {
 					rangeSelector: {
 						selected: 1
 					},
 					title: {
-						text: 'Stock Prices'
+						text: 'Stock Prices over the last 1,000 days'
 					},
 					plotOptions: {
 						series: {
@@ -21782,358 +21887,7 @@
 	exports.default = Chart;
 
 /***/ },
-/* 174 */,
-/* 175 */,
-/* 176 */,
-/* 177 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(178);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(180)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./style.scss", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./style.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 178 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(179)();
-	// imports
-
-
-	// module
-	exports.push([module.id, "body {\n  background: #E7ECEF;\n  color: #272932;\n  text-align: center;\n  font-family: 'Lato', sans-serif; }\n\n.main .title {\n  margin-top: 25px;\n  font-size: 35px; }\n\n.main .twitterLink {\n  margin-top: -12px;\n  margin-bottom: 20px;\n  font-size: 16px; }\n  .main .twitterLink a, .main .twitterLink a:visited {\n    color: #122369; }\n  .main .twitterLink a:hover {\n    color: #FF4A81; }\n\n.main .search {\n  font-size: 22px;\n  width: 280px;\n  padding: 6px; }\n\n.main .searchBtn {\n  font-size: 24px;\n  padding: 5px 15px;\n  margin-top: 15px;\n  border: none;\n  background: #11B5E4; }\n\n.main .searchBtn:hover {\n  cursor: pointer;\n  background: #F9C22E; }\n\n.main .loadingMsg {\n  font-size: 20px;\n  color: #FF5F3D; }\n\n.stocksWrapper {\n  width: 95vw;\n  margin: -15px auto 35px auto;\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n  justify-content: center; }\n  .stocksWrapper .stockContainer {\n    font-size: 34px;\n    font-weight: bold;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    width: 350px;\n    height: 65px;\n    margin: 15px;\n    border: 1px solid #1D1E2C;\n    border-radius: 1px;\n    background: rgba(150, 150, 150, 0.55); }\n    .stocksWrapper .stockContainer span {\n      margin-right: 25px; }\n  .stocksWrapper .stockContainer:hover {\n    background: #F74961;\n    cursor: pointer; }\n\n.chartWrapper {\n  max-width: 750px;\n  margin: 25px auto; }\n  .chartWrapper .chart {\n    border: 1px solid #1D1E2C;\n    border-radius: 3px; }\n\n@media screen and (max-width: 600px) {\n  .main .title {\n    margin-top: 20px;\n    font-size: 28px; }\n  .main .currentStocksTitle {\n    font-size: 22px;\n    margin-bottom: 35px; }\n  .stocksWrapper {\n    width: 95vw;\n    margin: -15px auto 35px auto; }\n    .stocksWrapper .stockContainer {\n      font-size: 28px;\n      width: 285px;\n      height: 55px;\n      margin: 10px; }\n      .stocksWrapper .stockContainer span {\n        margin-right: 20px; } }\n", ""]);
-
-	// exports
-
-
-/***/ },
-/* 179 */
-/***/ function(module, exports) {
-
-	/*
-		MIT License http://www.opensource.org/licenses/mit-license.php
-		Author Tobias Koppers @sokra
-	*/
-	// css base code, injected by the css-loader
-	module.exports = function() {
-		var list = [];
-
-		// return the list of modules as css string
-		list.toString = function toString() {
-			var result = [];
-			for(var i = 0; i < this.length; i++) {
-				var item = this[i];
-				if(item[2]) {
-					result.push("@media " + item[2] + "{" + item[1] + "}");
-				} else {
-					result.push(item[1]);
-				}
-			}
-			return result.join("");
-		};
-
-		// import a list of modules into the list
-		list.i = function(modules, mediaQuery) {
-			if(typeof modules === "string")
-				modules = [[null, modules, ""]];
-			var alreadyImportedModules = {};
-			for(var i = 0; i < this.length; i++) {
-				var id = this[i][0];
-				if(typeof id === "number")
-					alreadyImportedModules[id] = true;
-			}
-			for(i = 0; i < modules.length; i++) {
-				var item = modules[i];
-				// skip already imported module
-				// this implementation is not 100% perfect for weird media query combinations
-				//  when a module is imported multiple times with different media queries.
-				//  I hope this will never occur (Hey this way we have smaller bundles)
-				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-					if(mediaQuery && !item[2]) {
-						item[2] = mediaQuery;
-					} else if(mediaQuery) {
-						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-					}
-					list.push(item);
-				}
-			}
-		};
-		return list;
-	};
-
-
-/***/ },
-/* 180 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/*
-		MIT License http://www.opensource.org/licenses/mit-license.php
-		Author Tobias Koppers @sokra
-	*/
-	var stylesInDom = {},
-		memoize = function(fn) {
-			var memo;
-			return function () {
-				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
-				return memo;
-			};
-		},
-		isOldIE = memoize(function() {
-			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
-		}),
-		getHeadElement = memoize(function () {
-			return document.head || document.getElementsByTagName("head")[0];
-		}),
-		singletonElement = null,
-		singletonCounter = 0,
-		styleElementsInsertedAtTop = [];
-
-	module.exports = function(list, options) {
-		if(false) {
-			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
-		}
-
-		options = options || {};
-		// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
-		// tags it will allow on a page
-		if (typeof options.singleton === "undefined") options.singleton = isOldIE();
-
-		// By default, add <style> tags to the bottom of <head>.
-		if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
-
-		var styles = listToStyles(list);
-		addStylesToDom(styles, options);
-
-		return function update(newList) {
-			var mayRemove = [];
-			for(var i = 0; i < styles.length; i++) {
-				var item = styles[i];
-				var domStyle = stylesInDom[item.id];
-				domStyle.refs--;
-				mayRemove.push(domStyle);
-			}
-			if(newList) {
-				var newStyles = listToStyles(newList);
-				addStylesToDom(newStyles, options);
-			}
-			for(var i = 0; i < mayRemove.length; i++) {
-				var domStyle = mayRemove[i];
-				if(domStyle.refs === 0) {
-					for(var j = 0; j < domStyle.parts.length; j++)
-						domStyle.parts[j]();
-					delete stylesInDom[domStyle.id];
-				}
-			}
-		};
-	}
-
-	function addStylesToDom(styles, options) {
-		for(var i = 0; i < styles.length; i++) {
-			var item = styles[i];
-			var domStyle = stylesInDom[item.id];
-			if(domStyle) {
-				domStyle.refs++;
-				for(var j = 0; j < domStyle.parts.length; j++) {
-					domStyle.parts[j](item.parts[j]);
-				}
-				for(; j < item.parts.length; j++) {
-					domStyle.parts.push(addStyle(item.parts[j], options));
-				}
-			} else {
-				var parts = [];
-				for(var j = 0; j < item.parts.length; j++) {
-					parts.push(addStyle(item.parts[j], options));
-				}
-				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
-			}
-		}
-	}
-
-	function listToStyles(list) {
-		var styles = [];
-		var newStyles = {};
-		for(var i = 0; i < list.length; i++) {
-			var item = list[i];
-			var id = item[0];
-			var css = item[1];
-			var media = item[2];
-			var sourceMap = item[3];
-			var part = {css: css, media: media, sourceMap: sourceMap};
-			if(!newStyles[id])
-				styles.push(newStyles[id] = {id: id, parts: [part]});
-			else
-				newStyles[id].parts.push(part);
-		}
-		return styles;
-	}
-
-	function insertStyleElement(options, styleElement) {
-		var head = getHeadElement();
-		var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
-		if (options.insertAt === "top") {
-			if(!lastStyleElementInsertedAtTop) {
-				head.insertBefore(styleElement, head.firstChild);
-			} else if(lastStyleElementInsertedAtTop.nextSibling) {
-				head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
-			} else {
-				head.appendChild(styleElement);
-			}
-			styleElementsInsertedAtTop.push(styleElement);
-		} else if (options.insertAt === "bottom") {
-			head.appendChild(styleElement);
-		} else {
-			throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
-		}
-	}
-
-	function removeStyleElement(styleElement) {
-		styleElement.parentNode.removeChild(styleElement);
-		var idx = styleElementsInsertedAtTop.indexOf(styleElement);
-		if(idx >= 0) {
-			styleElementsInsertedAtTop.splice(idx, 1);
-		}
-	}
-
-	function createStyleElement(options) {
-		var styleElement = document.createElement("style");
-		styleElement.type = "text/css";
-		insertStyleElement(options, styleElement);
-		return styleElement;
-	}
-
-	function createLinkElement(options) {
-		var linkElement = document.createElement("link");
-		linkElement.rel = "stylesheet";
-		insertStyleElement(options, linkElement);
-		return linkElement;
-	}
-
-	function addStyle(obj, options) {
-		var styleElement, update, remove;
-
-		if (options.singleton) {
-			var styleIndex = singletonCounter++;
-			styleElement = singletonElement || (singletonElement = createStyleElement(options));
-			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
-			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
-		} else if(obj.sourceMap &&
-			typeof URL === "function" &&
-			typeof URL.createObjectURL === "function" &&
-			typeof URL.revokeObjectURL === "function" &&
-			typeof Blob === "function" &&
-			typeof btoa === "function") {
-			styleElement = createLinkElement(options);
-			update = updateLink.bind(null, styleElement);
-			remove = function() {
-				removeStyleElement(styleElement);
-				if(styleElement.href)
-					URL.revokeObjectURL(styleElement.href);
-			};
-		} else {
-			styleElement = createStyleElement(options);
-			update = applyToTag.bind(null, styleElement);
-			remove = function() {
-				removeStyleElement(styleElement);
-			};
-		}
-
-		update(obj);
-
-		return function updateStyle(newObj) {
-			if(newObj) {
-				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
-					return;
-				update(obj = newObj);
-			} else {
-				remove();
-			}
-		};
-	}
-
-	var replaceText = (function () {
-		var textStore = [];
-
-		return function (index, replacement) {
-			textStore[index] = replacement;
-			return textStore.filter(Boolean).join('\n');
-		};
-	})();
-
-	function applyToSingletonTag(styleElement, index, remove, obj) {
-		var css = remove ? "" : obj.css;
-
-		if (styleElement.styleSheet) {
-			styleElement.styleSheet.cssText = replaceText(index, css);
-		} else {
-			var cssNode = document.createTextNode(css);
-			var childNodes = styleElement.childNodes;
-			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
-			if (childNodes.length) {
-				styleElement.insertBefore(cssNode, childNodes[index]);
-			} else {
-				styleElement.appendChild(cssNode);
-			}
-		}
-	}
-
-	function applyToTag(styleElement, obj) {
-		var css = obj.css;
-		var media = obj.media;
-
-		if(media) {
-			styleElement.setAttribute("media", media)
-		}
-
-		if(styleElement.styleSheet) {
-			styleElement.styleSheet.cssText = css;
-		} else {
-			while(styleElement.firstChild) {
-				styleElement.removeChild(styleElement.firstChild);
-			}
-			styleElement.appendChild(document.createTextNode(css));
-		}
-	}
-
-	function updateLink(linkElement, obj) {
-		var css = obj.css;
-		var sourceMap = obj.sourceMap;
-
-		if(sourceMap) {
-			// http://stackoverflow.com/a/26603875
-			css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
-		}
-
-		var blob = new Blob([css], { type: "text/css" });
-
-		var oldSrc = linkElement.href;
-
-		linkElement.href = URL.createObjectURL(blob);
-
-		if(oldSrc)
-			URL.revokeObjectURL(oldSrc);
-	}
-
-
-/***/ },
-/* 181 */
+/* 175 */
 /***/ function(module, exports) {
 
 	/*
@@ -22521,16 +22275,361 @@
 
 
 /***/ },
-/* 182 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
-	!function(t,r){ true?module.exports=r(__webpack_require__(2),__webpack_require__(181)):"function"==typeof define&&define.amd?define(["react","highcharts"],r):"object"==typeof exports?exports.ReactHighcharts=r(require("react"),require("highcharts")):t.ReactHighcharts=r(t.React,t.Highcharts)}(this,function(t,r){return function(t){function r(o){if(e[o])return e[o].exports;var n=e[o]={exports:{},id:o,loaded:!1};return t[o].call(n.exports,n,n.exports,r),n.loaded=!0,n.exports}var e={};return r.m=t,r.c=e,r.p="",r(0)}([function(t,r,e){t.exports=e(3)},function(r,e){r.exports=t},function(t,r,e){(function(r){"use strict";var o=Object.assign||function(t){for(var r=1;r<arguments.length;r++){var e=arguments[r];for(var o in e)Object.prototype.hasOwnProperty.call(e,o)&&(t[o]=e[o])}return t},n=e(1),i="undefined"==typeof r?window:r;t.exports=function(r,e){var c="Highcharts"+r,s=n.createClass({displayName:c,propTypes:{config:n.PropTypes.object.isRequired,isPureConfig:n.PropTypes.bool,neverReflow:n.PropTypes.bool,callback:n.PropTypes.func,domProps:n.PropTypes.object},defaultProps:{callback:function(){},domProps:{}},renderChart:function(t){var n=this;if(!t)throw new Error("Config must be specified for the "+c+" component");var s=t.chart;this.chart=new e[r](o({},t,{chart:o({},s,{renderTo:this.refs.chart})}),this.props.callback),this.props.neverReflow||i.requestAnimationFrame&&requestAnimationFrame(function(){n.chart&&n.chart.options&&n.chart.reflow()})},shouldComponentUpdate:function(t){return!!(t.neverReflow||t.isPureConfig&&this.props.config===t.config)||(this.renderChart(t.config),!1)},getChart:function(){if(!this.chart)throw new Error("getChart() should not be called before the component is mounted");return this.chart},componentDidMount:function(){this.renderChart(this.props.config)},componentWillUnmount:function(){this.chart.destroy()},render:function(){return n.createElement("div",o({ref:"chart"},this.props.domProps))}});return s.Highcharts=e,s.withHighcharts=function(e){return t.exports(r,e)},s}}).call(r,function(){return this}())},function(t,r,e){"use strict";t.exports=e(2)("Chart",e(4))},function(t,e){t.exports=r}])});
+	!function(t,r){ true?module.exports=r(__webpack_require__(2),__webpack_require__(175)):"function"==typeof define&&define.amd?define(["react","highcharts"],r):"object"==typeof exports?exports.ReactHighcharts=r(require("react"),require("highcharts")):t.ReactHighcharts=r(t.React,t.Highcharts)}(this,function(t,r){return function(t){function r(o){if(e[o])return e[o].exports;var n=e[o]={exports:{},id:o,loaded:!1};return t[o].call(n.exports,n,n.exports,r),n.loaded=!0,n.exports}var e={};return r.m=t,r.c=e,r.p="",r(0)}([function(t,r,e){t.exports=e(3)},function(r,e){r.exports=t},function(t,r,e){(function(r){"use strict";var o=Object.assign||function(t){for(var r=1;r<arguments.length;r++){var e=arguments[r];for(var o in e)Object.prototype.hasOwnProperty.call(e,o)&&(t[o]=e[o])}return t},n=e(1),i="undefined"==typeof r?window:r;t.exports=function(r,e){var c="Highcharts"+r,s=n.createClass({displayName:c,propTypes:{config:n.PropTypes.object.isRequired,isPureConfig:n.PropTypes.bool,neverReflow:n.PropTypes.bool,callback:n.PropTypes.func,domProps:n.PropTypes.object},defaultProps:{callback:function(){},domProps:{}},renderChart:function(t){var n=this;if(!t)throw new Error("Config must be specified for the "+c+" component");var s=t.chart;this.chart=new e[r](o({},t,{chart:o({},s,{renderTo:this.refs.chart})}),this.props.callback),this.props.neverReflow||i.requestAnimationFrame&&requestAnimationFrame(function(){n.chart&&n.chart.options&&n.chart.reflow()})},shouldComponentUpdate:function(t){return!!(t.neverReflow||t.isPureConfig&&this.props.config===t.config)||(this.renderChart(t.config),!1)},getChart:function(){if(!this.chart)throw new Error("getChart() should not be called before the component is mounted");return this.chart},componentDidMount:function(){this.renderChart(this.props.config)},componentWillUnmount:function(){this.chart.destroy()},render:function(){return n.createElement("div",o({ref:"chart"},this.props.domProps))}});return s.Highcharts=e,s.withHighcharts=function(e){return t.exports(r,e)},s}}).call(r,function(){return this}())},function(t,r,e){"use strict";t.exports=e(2)("Chart",e(4))},function(t,e){t.exports=r}])});
 
 /***/ },
-/* 183 */,
-/* 184 */,
-/* 185 */,
-/* 186 */
+/* 177 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(178);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(180)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./style.scss", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./style.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 178 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(179)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "body {\n  background: #E7ECEF;\n  color: #272932;\n  text-align: center;\n  font-family: 'Lato', sans-serif; }\n\n.main .title {\n  margin-top: 25px;\n  font-size: 35px; }\n\n.main .info {\n  margin-top: -12px;\n  margin-bottom: 20px;\n  font-size: 16px; }\n  .main .info a, .main .info a:visited {\n    color: #122369; }\n  .main .info a:hover {\n    color: #FF4A81; }\n\n.main .aboutLink, .main .aboutLink:visited {\n  margin-top: -15px;\n  color: #122369;\n  text-decoration: underline; }\n\n.main .aboutLink:hover {\n  color: #FF4A81;\n  cursor: pointer; }\n\n.main .search {\n  font-size: 22px;\n  width: 280px;\n  padding: 6px; }\n\n.main .searchBtn {\n  font-size: 24px;\n  padding: 5px 15px;\n  margin-top: 15px;\n  border: none;\n  background: #11B5E4; }\n\n.main .searchBtn:hover {\n  cursor: pointer;\n  background: #F9C22E; }\n\n.main .loadingMsg {\n  font-size: 20px;\n  color: #FF5F3D; }\n\n.aboutComponent {\n  position: absolute;\n  background: rgba(250, 250, 250, 0.92);\n  border: 1px solid #11B5E4;\n  border-radius: 5px;\n  top: 55px;\n  margin-left: auto;\n  margin-right: auto;\n  left: 0;\n  right: 0;\n  width: 450px;\n  height: 350px;\n  padding: 10px 25px;\n  z-index: 5; }\n  .aboutComponent a, .aboutComponent a:visited {\n    color: #272932; }\n  .aboutComponent a:hover {\n    color: #FF4A81; }\n  .aboutComponent .aboutContent {\n    padding-top: 25px; }\n  .aboutComponent button {\n    font-size: 24px;\n    padding: 5px 15px;\n    margin-top: 15px;\n    border: 1px solid #11B5E4;\n    background: white; }\n  .aboutComponent button:hover {\n    cursor: pointer;\n    border: 1px solid #FF5F3D; }\n  .aboutComponent p {\n    font-size: 22px; }\n\n.flexWrapper {\n  margin-top: 35px;\n  display: flex;\n  justify-content: center;\n  flex-wrap: wrap; }\n  .flexWrapper .chartComponent {\n    border: 1px solid #1D1E2C; }\n  .flexWrapper .stocksComponent {\n    margin-top: 25px;\n    display: flex;\n    flex-direction: row;\n    flex-wrap: wrap;\n    justify-content: center;\n    margin-right: 25px; }\n\n.stocksWrapper .stockContainer {\n  font-size: 24px;\n  font-weight: bold;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  width: 200px;\n  height: 45px;\n  margin: 12px;\n  border: 1px solid #1D1E2C;\n  border-radius: 1px;\n  background: rgba(150, 150, 150, 0.55); }\n  .stocksWrapper .stockContainer span {\n    margin-right: 20px; }\n\n.stocksWrapper .stockContainer:hover {\n  background: #FF5F3D;\n  cursor: pointer; }\n\n@media screen and (max-width: 600px) {\n  .main .title {\n    margin-top: 20px;\n    font-size: 28px; }\n  .main .currentStocksTitle {\n    font-size: 22px;\n    margin-bottom: 35px; }\n  .aboutComponent {\n    top: 40px;\n    width: 80vw;\n    padding: 10px 15px;\n    z-index: 5; }\n    .aboutComponent h1 {\n      font-size: 24px; }\n    .aboutComponent p {\n      font-size: 18px; }\n    .aboutComponent .flexWrapper .stocksComponent {\n      margin-top: 0; }\n  .chartWrapper {\n    width: 100vw;\n    margin-top: 20px; }\n  .stockContainer span {\n    margin-right: 15px; } }\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 179 */
+/***/ function(module, exports) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	// css base code, injected by the css-loader
+	module.exports = function() {
+		var list = [];
+
+		// return the list of modules as css string
+		list.toString = function toString() {
+			var result = [];
+			for(var i = 0; i < this.length; i++) {
+				var item = this[i];
+				if(item[2]) {
+					result.push("@media " + item[2] + "{" + item[1] + "}");
+				} else {
+					result.push(item[1]);
+				}
+			}
+			return result.join("");
+		};
+
+		// import a list of modules into the list
+		list.i = function(modules, mediaQuery) {
+			if(typeof modules === "string")
+				modules = [[null, modules, ""]];
+			var alreadyImportedModules = {};
+			for(var i = 0; i < this.length; i++) {
+				var id = this[i][0];
+				if(typeof id === "number")
+					alreadyImportedModules[id] = true;
+			}
+			for(i = 0; i < modules.length; i++) {
+				var item = modules[i];
+				// skip already imported module
+				// this implementation is not 100% perfect for weird media query combinations
+				//  when a module is imported multiple times with different media queries.
+				//  I hope this will never occur (Hey this way we have smaller bundles)
+				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+					if(mediaQuery && !item[2]) {
+						item[2] = mediaQuery;
+					} else if(mediaQuery) {
+						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+					}
+					list.push(item);
+				}
+			}
+		};
+		return list;
+	};
+
+
+/***/ },
+/* 180 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	var stylesInDom = {},
+		memoize = function(fn) {
+			var memo;
+			return function () {
+				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+				return memo;
+			};
+		},
+		isOldIE = memoize(function() {
+			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+		}),
+		getHeadElement = memoize(function () {
+			return document.head || document.getElementsByTagName("head")[0];
+		}),
+		singletonElement = null,
+		singletonCounter = 0,
+		styleElementsInsertedAtTop = [];
+
+	module.exports = function(list, options) {
+		if(false) {
+			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+		}
+
+		options = options || {};
+		// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+		// tags it will allow on a page
+		if (typeof options.singleton === "undefined") options.singleton = isOldIE();
+
+		// By default, add <style> tags to the bottom of <head>.
+		if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
+
+		var styles = listToStyles(list);
+		addStylesToDom(styles, options);
+
+		return function update(newList) {
+			var mayRemove = [];
+			for(var i = 0; i < styles.length; i++) {
+				var item = styles[i];
+				var domStyle = stylesInDom[item.id];
+				domStyle.refs--;
+				mayRemove.push(domStyle);
+			}
+			if(newList) {
+				var newStyles = listToStyles(newList);
+				addStylesToDom(newStyles, options);
+			}
+			for(var i = 0; i < mayRemove.length; i++) {
+				var domStyle = mayRemove[i];
+				if(domStyle.refs === 0) {
+					for(var j = 0; j < domStyle.parts.length; j++)
+						domStyle.parts[j]();
+					delete stylesInDom[domStyle.id];
+				}
+			}
+		};
+	}
+
+	function addStylesToDom(styles, options) {
+		for(var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+			if(domStyle) {
+				domStyle.refs++;
+				for(var j = 0; j < domStyle.parts.length; j++) {
+					domStyle.parts[j](item.parts[j]);
+				}
+				for(; j < item.parts.length; j++) {
+					domStyle.parts.push(addStyle(item.parts[j], options));
+				}
+			} else {
+				var parts = [];
+				for(var j = 0; j < item.parts.length; j++) {
+					parts.push(addStyle(item.parts[j], options));
+				}
+				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+			}
+		}
+	}
+
+	function listToStyles(list) {
+		var styles = [];
+		var newStyles = {};
+		for(var i = 0; i < list.length; i++) {
+			var item = list[i];
+			var id = item[0];
+			var css = item[1];
+			var media = item[2];
+			var sourceMap = item[3];
+			var part = {css: css, media: media, sourceMap: sourceMap};
+			if(!newStyles[id])
+				styles.push(newStyles[id] = {id: id, parts: [part]});
+			else
+				newStyles[id].parts.push(part);
+		}
+		return styles;
+	}
+
+	function insertStyleElement(options, styleElement) {
+		var head = getHeadElement();
+		var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
+		if (options.insertAt === "top") {
+			if(!lastStyleElementInsertedAtTop) {
+				head.insertBefore(styleElement, head.firstChild);
+			} else if(lastStyleElementInsertedAtTop.nextSibling) {
+				head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
+			} else {
+				head.appendChild(styleElement);
+			}
+			styleElementsInsertedAtTop.push(styleElement);
+		} else if (options.insertAt === "bottom") {
+			head.appendChild(styleElement);
+		} else {
+			throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
+		}
+	}
+
+	function removeStyleElement(styleElement) {
+		styleElement.parentNode.removeChild(styleElement);
+		var idx = styleElementsInsertedAtTop.indexOf(styleElement);
+		if(idx >= 0) {
+			styleElementsInsertedAtTop.splice(idx, 1);
+		}
+	}
+
+	function createStyleElement(options) {
+		var styleElement = document.createElement("style");
+		styleElement.type = "text/css";
+		insertStyleElement(options, styleElement);
+		return styleElement;
+	}
+
+	function createLinkElement(options) {
+		var linkElement = document.createElement("link");
+		linkElement.rel = "stylesheet";
+		insertStyleElement(options, linkElement);
+		return linkElement;
+	}
+
+	function addStyle(obj, options) {
+		var styleElement, update, remove;
+
+		if (options.singleton) {
+			var styleIndex = singletonCounter++;
+			styleElement = singletonElement || (singletonElement = createStyleElement(options));
+			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
+			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
+		} else if(obj.sourceMap &&
+			typeof URL === "function" &&
+			typeof URL.createObjectURL === "function" &&
+			typeof URL.revokeObjectURL === "function" &&
+			typeof Blob === "function" &&
+			typeof btoa === "function") {
+			styleElement = createLinkElement(options);
+			update = updateLink.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+				if(styleElement.href)
+					URL.revokeObjectURL(styleElement.href);
+			};
+		} else {
+			styleElement = createStyleElement(options);
+			update = applyToTag.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+			};
+		}
+
+		update(obj);
+
+		return function updateStyle(newObj) {
+			if(newObj) {
+				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
+					return;
+				update(obj = newObj);
+			} else {
+				remove();
+			}
+		};
+	}
+
+	var replaceText = (function () {
+		var textStore = [];
+
+		return function (index, replacement) {
+			textStore[index] = replacement;
+			return textStore.filter(Boolean).join('\n');
+		};
+	})();
+
+	function applyToSingletonTag(styleElement, index, remove, obj) {
+		var css = remove ? "" : obj.css;
+
+		if (styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = replaceText(index, css);
+		} else {
+			var cssNode = document.createTextNode(css);
+			var childNodes = styleElement.childNodes;
+			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
+			if (childNodes.length) {
+				styleElement.insertBefore(cssNode, childNodes[index]);
+			} else {
+				styleElement.appendChild(cssNode);
+			}
+		}
+	}
+
+	function applyToTag(styleElement, obj) {
+		var css = obj.css;
+		var media = obj.media;
+
+		if(media) {
+			styleElement.setAttribute("media", media)
+		}
+
+		if(styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = css;
+		} else {
+			while(styleElement.firstChild) {
+				styleElement.removeChild(styleElement.firstChild);
+			}
+			styleElement.appendChild(document.createTextNode(css));
+		}
+	}
+
+	function updateLink(linkElement, obj) {
+		var css = obj.css;
+		var sourceMap = obj.sourceMap;
+
+		if(sourceMap) {
+			// http://stackoverflow.com/a/26603875
+			css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+		}
+
+		var blob = new Blob([css], { type: "text/css" });
+
+		var oldSrc = linkElement.href;
+
+		linkElement.href = URL.createObjectURL(blob);
+
+		if(oldSrc)
+			URL.revokeObjectURL(oldSrc);
+	}
+
+
+/***/ },
+/* 181 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22553,43 +22652,56 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Search = function (_React$Component) {
-		_inherits(Search, _React$Component);
+	var About = function (_React$Component) {
+		_inherits(About, _React$Component);
 
-		function Search() {
-			_classCallCheck(this, Search);
+		function About() {
+			_classCallCheck(this, About);
 
-			return _possibleConstructorReturn(this, (Search.__proto__ || Object.getPrototypeOf(Search)).apply(this, arguments));
+			return _possibleConstructorReturn(this, (About.__proto__ || Object.getPrototypeOf(About)).apply(this, arguments));
 		}
 
-		_createClass(Search, [{
+		_createClass(About, [{
 			key: 'render',
 			value: function render() {
 				return _react2.default.createElement(
 					'div',
-					null,
-					_react2.default.createElement('input', {
-						type: 'text',
-						className: 'search',
-						placeholder: 'Add a New Stock',
-						value: this.props.inputSymbol,
-						onChange: this.props.handleInput }),
-					_react2.default.createElement('br', null),
+					{ className: 'aboutComponent' },
 					_react2.default.createElement(
-						'button',
-						{ className: 'searchBtn', onClick: this.props.addStock },
-						'Add a new stock'
+						'div',
+						{ className: 'aboutContent' },
+						_react2.default.createElement(
+							'h2',
+							null,
+							'This is a project for',
+							_react2.default.createElement('br', null),
+							_react2.default.createElement(
+								'a',
+								{ target: '_blank', href: 'https://www.freecodecamp.com/challenges/chart-the-stock-market' },
+								'Free Code Camp'
+							)
+						),
+						_react2.default.createElement(
+							'p',
+							null,
+							'You can search for US stocks by symbol and view recent price data. Any stocks you add or remove will be updated in real time on any other device viewing this page.'
+						),
+						_react2.default.createElement(
+							'button',
+							{ onClick: this.props.toggleInfo },
+							'Close'
+						)
 					)
 				);
 			}
 		}]);
 
-		return Search;
+		return About;
 	}(_react2.default.Component);
 
 	;
 
-	exports.default = Search;
+	exports.default = About;
 
 /***/ }
 /******/ ]);
