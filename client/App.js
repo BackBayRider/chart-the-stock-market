@@ -143,6 +143,7 @@ class App extends React.Component {
 				</div>
 			);
 		});
+		const dataset = this.state.stocks.slice();
 		return (
 			<div className = 'main'>
 				<h1 className = 'title'>Chart the Stock Market</h1>
@@ -159,7 +160,7 @@ class App extends React.Component {
 					<button className = 'searchBtn' onClick = {this.addStock}>Add a new stock</button>
 					{ this.state.loading && <p className = 'loadingMsg'>Loading Data...</p> }
 				</div>
-				<Chart />
+				<Chart dataset = {dataset}/>
 				<h2 className = 'currentStocksTitle'>Current Stocks (click to remove):</h2>
 				<div className = 'stocksWrapper'>
 					{renderStocks}

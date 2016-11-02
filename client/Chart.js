@@ -1,10 +1,13 @@
 import React from 'react'
+import HighCharts from 'highcharts'
 
 class Chart extends React.Component {
+
 	render() {
+		console.log(this.props.dataset)
 		return (
 			<div className = 'chartWrapper'>
-				<h1>This is the Chart Component</h1>
+
 			</div>
 		);
 	}
