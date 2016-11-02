@@ -74,7 +74,6 @@ io.on('connection', (socket) => {
 				db.close();
 			});
 		}).catch( (err) => {
-			console.log(err);
 			socket.emit('lookup-error', 'This symbol could not be found!');
 		});
 	});

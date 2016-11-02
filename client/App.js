@@ -146,7 +146,7 @@ class App extends React.Component {
 		// list of current stocks to be displayed on page
 		const renderStocks = this.state.stocks.map( (stock, idx) => {
 			return (
-				<div key = {idx} className = 'stockContainer' onClick = {this.removeStock.bind(this, stock.dataset.dataset_code, idx)}>
+				<div key = {idx} className = 'stock' onClick = {this.removeStock.bind(this, stock.dataset.dataset_code, idx)}>
 					<span className = 'stockTitle'>{stock.dataset.dataset_code}</span>
 					<i className = "fa fa-trash" aria-hidden="true"></i>
 				</div>
@@ -175,8 +175,8 @@ class App extends React.Component {
 						<p className = 'loadingMsg'>Please wait, the data is loading...</p> }
 
 					<div className = 'flexWrapper'>
-						<div className =  'stocksComponent'>
-							<div className = 'stocksWrapper'>
+						<div>
+							<div className = 'stocksComponent'>
 								{renderStocks}
 							</div>
 						</div>

@@ -96,40 +96,33 @@ body {
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
-	.chartComponent {
-		border: 1px solid #1D1E2C;
-	}
 	.stocksComponent {
 		margin-top: 25px;
-
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
 		justify-content: center;
-		margin-right: 25px;
-	}
-}
-
-.stocksWrapper {
-	.stockContainer {
-		font-size: 24px;
-		font-weight: bold;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		width: 200px;
-		height: 45px;
-		margin: 12px;
-		border: 1px solid #1D1E2C;
-		border-radius: 1px;
-		background: rgba(150,150,150,0.55);
-		span {
-			margin-right: 20px;
+		width: 250px;
+		.stock {
+			font-size: 24px;
+			font-weight: bold;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 200px;
+			height: 45px;
+			margin: 12px auto 12px auto;
+			border: 1px solid #1D1E2C;
+			border-radius: 1px;
+			background: rgba(150,150,150,0.55);
+			span {
+				margin-right: 20px;
+			}
 		}
-	}
-	.stockContainer:hover {
-		background: #FF5F3D;
-		cursor: pointer;
+		.stock:hover {
+			background: #FF5F3D;
+			cursor: pointer;
+		}
 	}
 }
 
@@ -157,17 +150,16 @@ body {
 		}
 		.flexWrapper {
 			.stocksComponent {
-				margin-top: 0;
+				.stock {
+					span {
+						margin-right: 12px;
+					}
+				}
 			}
 		}
 	}
 	.chartWrapper {
 		width: 100vw;
 		margin-top: 20px;
-	}
-	.stockContainer {
-		span {
-			margin-right: 15px;
-		}
 	}
 }
