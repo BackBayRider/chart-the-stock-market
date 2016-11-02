@@ -71,14 +71,13 @@ body {
 		cursor: pointer;
 	}
 }
-
 .chartWrapper {
-	width: 600px;
-	height: 450px;
-	margin: 15px auto;
-	border: 1px solid #1D1E2C;
-	border-radius: 3px;
-	background: rgba(150,150,150,0.15);
+	max-width: 750px;
+	margin: 25px auto;
+	.chart {
+		border: 1px solid #1D1E2C;
+		border-radius: 3px;
+	}
 }
 
 @media screen and (max-width: 600px) {

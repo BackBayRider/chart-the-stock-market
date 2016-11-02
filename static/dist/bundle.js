@@ -62,11 +62,15 @@
 
 	var _reactDom = __webpack_require__(35);
 
+	var _Search = __webpack_require__(186);
+
+	var _Search2 = _interopRequireDefault(_Search);
+
 	var _Chart = __webpack_require__(173);
 
 	var _Chart2 = _interopRequireDefault(_Chart);
 
-	__webpack_require__(174);
+	__webpack_require__(177);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -99,6 +103,7 @@
 			_this.handleInput = _this.handleInput.bind(_this);
 			_this.addStock = _this.addStock.bind(_this);
 			_this.removeStock = _this.removeStock.bind(_this);
+
 			return _this;
 		}
 
@@ -139,7 +144,6 @@
 
 				// listen for any stocks added by other clients and add them to local state
 				socket.on('stock-added', function (data) {
-					console.log('Received new data:', data);
 					var stocks = _this3.state.stocks;
 
 					var updatedStocks = [].concat(_toConsumableArray(stocks), [data]);
@@ -162,7 +166,7 @@
 					var stocks = _this3.state.stocks;
 
 					var updatedStocks = stocks.filter(function (stock) {
-						return stock.dataset.dataset_code !== symbol;
+						return stock.dataset.dataset_code !== symbol.toUpperCase();
 					});
 					_this3.setState({
 						stocks: updatedStocks
@@ -224,15 +228,16 @@
 			}
 		}, {
 			key: 'removeStock',
-			value: function removeStock(ticker, idx) {
+			value: function removeStock(ticker) {
 				if (!this.state.initialLoad) {
 					// remove stock from local state
 					var stocks = this.state.stocks;
 
-					stocks.splice(idx, 1);
-
+					var updatedStocks = stocks.filter(function (stock) {
+						return stock.dataset.dataset_code !== ticker.toUpperCase();
+					});
 					this.setState({
-						stocks: stocks
+						stocks: updatedStocks
 					});
 					// dispatch action to server to remove stock from from databse and broadcast remove event to all listeners
 					socket.emit('remove-stock', ticker);
@@ -255,7 +260,8 @@
 						_react2.default.createElement('i', { className: 'fa fa-trash', 'aria-hidden': 'true' })
 					);
 				});
-				var dataset = this.state.stocks.slice();
+				var stocks = this.state.stocks;
+
 				return _react2.default.createElement(
 					'div',
 					{ className: 'main' },
@@ -273,28 +279,16 @@
 							'@bonham000'
 						)
 					),
-					_react2.default.createElement(
-						'div',
-						null,
-						_react2.default.createElement('input', {
-							type: 'text',
-							className: 'search',
-							placeholder: 'Add a New Stock',
-							value: this.state.inputSymbol,
-							onChange: this.handleInput }),
-						_react2.default.createElement('br', null),
-						_react2.default.createElement(
-							'button',
-							{ className: 'searchBtn', onClick: this.addStock },
-							'Add a new stock'
-						),
-						this.state.loading && _react2.default.createElement(
-							'p',
-							{ className: 'loadingMsg' },
-							'Loading Data...'
-						)
+					_react2.default.createElement(_Search2.default, {
+						inputSymbol: this.state.inputSymbol,
+						handleInput: this.handleInput,
+						addStock: this.addStock }),
+					this.state.loading && _react2.default.createElement(
+						'p',
+						{ className: 'loadingMsg' },
+						'Please wait, the data is loading...'
 					),
-					_react2.default.createElement(_Chart2.default, { dataset: dataset }),
+					_react2.default.createElement(_Chart2.default, { stockData: stocks, initStatus: this.state.initialLoad }),
 					_react2.default.createElement(
 						'h2',
 						{ className: 'currentStocksTitle' },
@@ -21699,9 +21693,13 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _highcharts = __webpack_require__(178);
+	var _highcharts = __webpack_require__(181);
 
 	var _highcharts2 = _interopRequireDefault(_highcharts);
+
+	var _reactHighcharts = __webpack_require__(182);
+
+	var _reactHighcharts2 = _interopRequireDefault(_reactHighcharts);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21721,10 +21719,58 @@
 		}
 
 		_createClass(Chart, [{
+			key: 'shouldComponentUpdate',
+			value: function shouldComponentUpdate(nextProps, nextState) {
+				if (nextProps.initStatus !== this.props.initStatus) {
+					return true;
+				} else if (nextProps.stockData.length === this.props.stockData.length) {
+					return false;
+				} else {
+					return true;
+				}
+			}
+		}, {
 			key: 'render',
 			value: function render() {
-				console.log(this.props.dataset);
-				return _react2.default.createElement('div', { className: 'chartWrapper' });
+				var chartData = this.props.stockData.map(function (stock) {
+					return {
+						name: stock.dataset.dataset_code,
+						data: stock.dataset.data.map(function (priceData) {
+							return [priceData[0], priceData[1]];
+						})
+					};
+				});
+				var slicedData = chartData.map(function (stock) {
+					return {
+						name: stock.name,
+						data: stock.data.slice(0, 1000).reverse()
+					};
+				});
+				var config = {
+					rangeSelector: {
+						selected: 1
+					},
+					title: {
+						text: 'Stock Prices'
+					},
+					plotOptions: {
+						series: {
+							compare: 'percent',
+							showInNavigator: true
+						}
+					},
+					tooltip: {
+						pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>${point.y}</b><br/>',
+						valueDecimals: 2,
+						split: true
+					},
+					series: slicedData
+				};
+				return _react2.default.createElement(
+					'div',
+					{ className: 'chartWrapper' },
+					!this.props.initStatus && _react2.default.createElement(_reactHighcharts2.default, { className: 'chart', config: config, ref: 'chart' })
+				);
 			}
 		}]);
 
@@ -21736,16 +21782,19 @@
 	exports.default = Chart;
 
 /***/ },
-/* 174 */
+/* 174 */,
+/* 175 */,
+/* 176 */,
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(175);
+	var content = __webpack_require__(178);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(177)(content, {});
+	var update = __webpack_require__(180)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -21762,21 +21811,21 @@
 	}
 
 /***/ },
-/* 175 */
+/* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(176)();
+	exports = module.exports = __webpack_require__(179)();
 	// imports
 
 
 	// module
-	exports.push([module.id, "body {\n  background: #E7ECEF;\n  color: #272932;\n  text-align: center;\n  font-family: 'Lato', sans-serif; }\n\n.main .title {\n  margin-top: 25px;\n  font-size: 35px; }\n\n.main .twitterLink {\n  margin-top: -12px;\n  margin-bottom: 20px;\n  font-size: 16px; }\n  .main .twitterLink a, .main .twitterLink a:visited {\n    color: #122369; }\n  .main .twitterLink a:hover {\n    color: #FF4A81; }\n\n.main .search {\n  font-size: 22px;\n  width: 280px;\n  padding: 6px; }\n\n.main .searchBtn {\n  font-size: 24px;\n  padding: 5px 15px;\n  margin-top: 15px;\n  border: none;\n  background: #11B5E4; }\n\n.main .searchBtn:hover {\n  cursor: pointer;\n  background: #F9C22E; }\n\n.main .loadingMsg {\n  font-size: 20px;\n  color: #FF5F3D; }\n\n.stocksWrapper {\n  width: 95vw;\n  margin: -15px auto 35px auto;\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n  justify-content: center; }\n  .stocksWrapper .stockContainer {\n    font-size: 34px;\n    font-weight: bold;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    width: 350px;\n    height: 65px;\n    margin: 15px;\n    border: 1px solid #1D1E2C;\n    border-radius: 1px;\n    background: rgba(150, 150, 150, 0.55); }\n    .stocksWrapper .stockContainer span {\n      margin-right: 25px; }\n  .stocksWrapper .stockContainer:hover {\n    background: #F74961;\n    cursor: pointer; }\n\n.chartWrapper {\n  width: 600px;\n  height: 450px;\n  margin: 15px auto;\n  border: 1px solid #1D1E2C;\n  border-radius: 3px;\n  background: rgba(150, 150, 150, 0.15); }\n\n@media screen and (max-width: 600px) {\n  .main .title {\n    margin-top: 20px;\n    font-size: 28px; }\n  .main .currentStocksTitle {\n    font-size: 22px;\n    margin-bottom: 35px; }\n  .stocksWrapper {\n    width: 95vw;\n    margin: -15px auto 35px auto; }\n    .stocksWrapper .stockContainer {\n      font-size: 28px;\n      width: 285px;\n      height: 55px;\n      margin: 10px; }\n      .stocksWrapper .stockContainer span {\n        margin-right: 20px; } }\n", ""]);
+	exports.push([module.id, "body {\n  background: #E7ECEF;\n  color: #272932;\n  text-align: center;\n  font-family: 'Lato', sans-serif; }\n\n.main .title {\n  margin-top: 25px;\n  font-size: 35px; }\n\n.main .twitterLink {\n  margin-top: -12px;\n  margin-bottom: 20px;\n  font-size: 16px; }\n  .main .twitterLink a, .main .twitterLink a:visited {\n    color: #122369; }\n  .main .twitterLink a:hover {\n    color: #FF4A81; }\n\n.main .search {\n  font-size: 22px;\n  width: 280px;\n  padding: 6px; }\n\n.main .searchBtn {\n  font-size: 24px;\n  padding: 5px 15px;\n  margin-top: 15px;\n  border: none;\n  background: #11B5E4; }\n\n.main .searchBtn:hover {\n  cursor: pointer;\n  background: #F9C22E; }\n\n.main .loadingMsg {\n  font-size: 20px;\n  color: #FF5F3D; }\n\n.stocksWrapper {\n  width: 95vw;\n  margin: -15px auto 35px auto;\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n  justify-content: center; }\n  .stocksWrapper .stockContainer {\n    font-size: 34px;\n    font-weight: bold;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    width: 350px;\n    height: 65px;\n    margin: 15px;\n    border: 1px solid #1D1E2C;\n    border-radius: 1px;\n    background: rgba(150, 150, 150, 0.55); }\n    .stocksWrapper .stockContainer span {\n      margin-right: 25px; }\n  .stocksWrapper .stockContainer:hover {\n    background: #F74961;\n    cursor: pointer; }\n\n.chartWrapper {\n  max-width: 750px;\n  margin: 25px auto; }\n  .chartWrapper .chart {\n    border: 1px solid #1D1E2C;\n    border-radius: 3px; }\n\n@media screen and (max-width: 600px) {\n  .main .title {\n    margin-top: 20px;\n    font-size: 28px; }\n  .main .currentStocksTitle {\n    font-size: 22px;\n    margin-bottom: 35px; }\n  .stocksWrapper {\n    width: 95vw;\n    margin: -15px auto 35px auto; }\n    .stocksWrapper .stockContainer {\n      font-size: 28px;\n      width: 285px;\n      height: 55px;\n      margin: 10px; }\n      .stocksWrapper .stockContainer span {\n        margin-right: 20px; } }\n", ""]);
 
 	// exports
 
 
 /***/ },
-/* 176 */
+/* 179 */
 /***/ function(module, exports) {
 
 	/*
@@ -21832,7 +21881,7 @@
 
 
 /***/ },
-/* 177 */
+/* 180 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -22084,7 +22133,7 @@
 
 
 /***/ },
-/* 178 */
+/* 181 */
 /***/ function(module, exports) {
 
 	/*
@@ -22470,6 +22519,77 @@
 	z=a.each,F=a.inArray,J=a.isObject,m=a.pick,f=a.splat;D.prototype.setResponsive=function(a){var f=this.options.responsive;f&&f.rules&&z(f.rules,function(f){this.matchResponsiveRule(f,a)},this)};D.prototype.matchResponsiveRule=function(f,q){var h=this.respRules,k=f.condition,v;v=f.callback||function(){return this.chartWidth<=m(k.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=m(k.maxHeight,Number.MAX_VALUE)&&this.chartWidth>=m(k.minWidth,0)&&this.chartHeight>=m(k.minHeight,0)};void 0===f._id&&(f._id=
 	a.idCounter++);v=v.call(this);!h[f._id]&&v?f.chartOptions&&(h[f._id]=this.currentOptions(f.chartOptions),this.update(f.chartOptions,q)):h[f._id]&&!v&&(this.update(h[f._id],q),delete h[f._id])};D.prototype.currentOptions=function(a){function h(a,m,d){var g,k;for(g in a)if(-1<F(g,["series","xAxis","yAxis"]))for(a[g]=f(a[g]),d[g]=[],k=0;k<a[g].length;k++)d[g][k]={},h(a[g][k],m[g][k],d[g][k]);else J(a[g])?(d[g]={},h(a[g],m[g]||{},d[g])):d[g]=m[g]||null}var m={};h(a,this.options,m);return m}})(M);return M});
 
+
+/***/ },
+/* 182 */
+/***/ function(module, exports, __webpack_require__) {
+
+	!function(t,r){ true?module.exports=r(__webpack_require__(2),__webpack_require__(181)):"function"==typeof define&&define.amd?define(["react","highcharts"],r):"object"==typeof exports?exports.ReactHighcharts=r(require("react"),require("highcharts")):t.ReactHighcharts=r(t.React,t.Highcharts)}(this,function(t,r){return function(t){function r(o){if(e[o])return e[o].exports;var n=e[o]={exports:{},id:o,loaded:!1};return t[o].call(n.exports,n,n.exports,r),n.loaded=!0,n.exports}var e={};return r.m=t,r.c=e,r.p="",r(0)}([function(t,r,e){t.exports=e(3)},function(r,e){r.exports=t},function(t,r,e){(function(r){"use strict";var o=Object.assign||function(t){for(var r=1;r<arguments.length;r++){var e=arguments[r];for(var o in e)Object.prototype.hasOwnProperty.call(e,o)&&(t[o]=e[o])}return t},n=e(1),i="undefined"==typeof r?window:r;t.exports=function(r,e){var c="Highcharts"+r,s=n.createClass({displayName:c,propTypes:{config:n.PropTypes.object.isRequired,isPureConfig:n.PropTypes.bool,neverReflow:n.PropTypes.bool,callback:n.PropTypes.func,domProps:n.PropTypes.object},defaultProps:{callback:function(){},domProps:{}},renderChart:function(t){var n=this;if(!t)throw new Error("Config must be specified for the "+c+" component");var s=t.chart;this.chart=new e[r](o({},t,{chart:o({},s,{renderTo:this.refs.chart})}),this.props.callback),this.props.neverReflow||i.requestAnimationFrame&&requestAnimationFrame(function(){n.chart&&n.chart.options&&n.chart.reflow()})},shouldComponentUpdate:function(t){return!!(t.neverReflow||t.isPureConfig&&this.props.config===t.config)||(this.renderChart(t.config),!1)},getChart:function(){if(!this.chart)throw new Error("getChart() should not be called before the component is mounted");return this.chart},componentDidMount:function(){this.renderChart(this.props.config)},componentWillUnmount:function(){this.chart.destroy()},render:function(){return n.createElement("div",o({ref:"chart"},this.props.domProps))}});return s.Highcharts=e,s.withHighcharts=function(e){return t.exports(r,e)},s}}).call(r,function(){return this}())},function(t,r,e){"use strict";t.exports=e(2)("Chart",e(4))},function(t,e){t.exports=r}])});
+
+/***/ },
+/* 183 */,
+/* 184 */,
+/* 185 */,
+/* 186 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Search = function (_React$Component) {
+		_inherits(Search, _React$Component);
+
+		function Search() {
+			_classCallCheck(this, Search);
+
+			return _possibleConstructorReturn(this, (Search.__proto__ || Object.getPrototypeOf(Search)).apply(this, arguments));
+		}
+
+		_createClass(Search, [{
+			key: 'render',
+			value: function render() {
+				return _react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement('input', {
+						type: 'text',
+						className: 'search',
+						placeholder: 'Add a New Stock',
+						value: this.props.inputSymbol,
+						onChange: this.props.handleInput }),
+					_react2.default.createElement('br', null),
+					_react2.default.createElement(
+						'button',
+						{ className: 'searchBtn', onClick: this.props.addStock },
+						'Add a new stock'
+					)
+				);
+			}
+		}]);
+
+		return Search;
+	}(_react2.default.Component);
+
+	;
+
+	exports.default = Search;
 
 /***/ }
 /******/ ]);

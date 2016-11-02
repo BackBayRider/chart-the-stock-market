@@ -1,6 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 
+import Search from './Search'
 import Chart from './Chart'
 
 import './theme/style.scss'
@@ -22,6 +23,7 @@ class App extends React.Component {
 		this.handleInput = this.handleInput.bind(this);
 		this.addStock = this.addStock.bind(this);
 		this.removeStock = this.removeStock.bind(this);
+
 	}
 	componentWillMount() {
 
@@ -54,7 +56,7 @@ class App extends React.Component {
 		
 		// listen for any stocks added by other clients and add them to local state
 		socket.on('stock-added', (data) => {
-			console.log('Received new data:', data);
+	
 			const { stocks } = this.state;
 			const updatedStocks = [...stocks, data];
 			this.setState({
@@ -75,7 +77,7 @@ class App extends React.Component {
 		socket.on('stock-removed', (symbol) => {
 			const { stocks } = this.state;
 			const updatedStocks = stocks.filter( (stock) => {
-				return stock.dataset.dataset_code !== symbol;
+				return stock.dataset.dataset_code !== symbol.toUpperCase();
 			});
 			this.setState({
 				stocks: updatedStocks
@@ -121,14 +123,15 @@ class App extends React.Component {
 			}
 		}
 	}
-	removeStock(ticker, idx) {
+	removeStock(ticker) {
 		if (!this.state.initialLoad) {
 			// remove stock from local state
 			const { stocks } = this.state;
-			stocks.splice(idx, 1);
-
+			const updatedStocks = stocks.filter( (stock) => {
+				return stock.dataset.dataset_code !== ticker.toUpperCase();
+			});
 			this.setState({
-				stocks: stocks
+				stocks: updatedStocks
 			});
 			// dispatch action to server to remove stock from from databse and broadcast remove event to all listeners
 			socket.emit('remove-stock', ticker);
@@ -143,24 +146,19 @@ class App extends React.Component {
 				</div>
 			);
 		});
-		const dataset = this.state.stocks.slice();
+		const { stocks } = this.state;
 		return (
 			<div className = 'main'>
 				<h1 className = 'title'>Chart the Stock Market</h1>
 				<p className = 'twitterLink'>
 					<a target = "_blank" href="https://twitter.com/bonham_000">@bonham000</a>
 				</p>
-				<div>
-					<input
-						type = "text"
-						className = 'search'
-						placeholder = 'Add a New Stock'
-						value = {this.state.inputSymbol}
-						onChange = {this.handleInput} /><br />
-					<button className = 'searchBtn' onClick = {this.addStock}>Add a new stock</button>
-					{ this.state.loading && <p className = 'loadingMsg'>Loading Data...</p> }
-				</div>
-				<Chart dataset = {dataset}/>
+				<Search
+					inputSymbol = {this.state.inputSymbol} 
+					handleInput = {this.handleInput}
+					addStock = {this.addStock} />
+				{ this.state.loading && <p className = 'loadingMsg'>Please wait, the data is loading...</p> }
+				<Chart stockData = {stocks} initStatus = {this.state.initialLoad} />
 				<h2 className = 'currentStocksTitle'>Current Stocks (click to remove):</h2>
 				<div className = 'stocksWrapper'>
 					{renderStocks}
