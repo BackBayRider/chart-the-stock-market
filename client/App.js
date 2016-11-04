@@ -7,7 +7,11 @@ import Chart from './Chart'
 
 import './theme/style.scss'
 
-const socket = io.connect('http://localhost:3000');
+const DEV_HOST = 'http://localhost:7000';
+const PROD_HOST = 'https://blooming-ocean-10450.herokuapp.com';
+const HOST = PROD_HOST;
+
+const socket = io.connect(PROD_HOST);
 
 class App extends React.Component {
 	constructor() {

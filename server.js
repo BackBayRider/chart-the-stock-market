@@ -3,7 +3,7 @@ import axios from 'axios'
 import assert from 'assert'
 import bodyParser from 'body-parser'
 import dotenv from 'dotenv'
-dotenv.config();
+dotenv.config({silent: true});
 
 import mongoose from 'mongoose'
 import mongodb from 'mongodb'
@@ -11,10 +11,9 @@ const MongoClient = mongodb.MongoClient;
 const DB_URL = process.env.MONGO_HOST;
 
 const app = express();
- 
-// Run server to listen on port 3000.
-const server = app.listen(3000, () => {
-  console.log('listening on *:3000');
+
+const server = app.listen(process.env.PORT || 7000, () => {
+  console.log('listening on port 7000');
 });
  
 const io = require('socket.io')(server);
