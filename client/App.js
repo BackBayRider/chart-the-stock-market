@@ -9,7 +9,7 @@ import './theme/style.scss'
 
 const DEV_HOST = 'http://localhost:7000';
 const PROD_HOST = 'https://blooming-ocean-10450.herokuapp.com';
-const HOST = PROD_HOST;
+const HOST = DEV_HOST;
 
 const socket = io.connect(DEV_HOST);
 

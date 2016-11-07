@@ -80,7 +80,7 @@
 
 	var DEV_HOST = 'http://localhost:7000';
 	var PROD_HOST = 'https://blooming-ocean-10450.herokuapp.com';
-	var HOST = PROD_HOST;
+	var HOST = DEV_HOST;
 
 	var socket = io.connect(DEV_HOST);
 
