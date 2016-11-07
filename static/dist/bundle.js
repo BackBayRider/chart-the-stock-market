@@ -82,7 +82,7 @@
 	var PROD_HOST = 'https://blooming-ocean-10450.herokuapp.com';
 	var HOST = DEV_HOST;
 
-	var socket = io.connect(DEV_HOST);
+	var socket = io.connect(PROD_HOST);
 
 	var App = function (_React$Component) {
 		_inherits(App, _React$Component);

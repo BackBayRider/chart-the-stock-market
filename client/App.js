@@ -11,7 +11,7 @@ const DEV_HOST = 'http://localhost:7000';
 const PROD_HOST = 'https://blooming-ocean-10450.herokuapp.com';
 const HOST = DEV_HOST;
 
-const socket = io.connect(DEV_HOST);
+const socket = io.connect(PROD_HOST);
 
 class App extends React.Component {
 	constructor() {
