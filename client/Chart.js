@@ -55,7 +55,7 @@ class Chart extends React.Component {
 		}
 		return (
 			<div className = 'chartWrapper'>
-				{ !this.props.initStatus && <ReactHighCharts className = 'chart' config = {config} ref = 'chart' /> }
+				{ !this.props.initStatus && chartData.length > 0 && <ReactHighCharts className = 'chart' config = {config} ref = 'chart' /> }
 			</div>
 		);
 	}

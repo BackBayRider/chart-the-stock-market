@@ -82,7 +82,7 @@
 	var PROD_HOST = 'https://blooming-ocean-10450.herokuapp.com';
 	var HOST = PROD_HOST;
 
-	var socket = io.connect(PROD_HOST);
+	var socket = io.connect(DEV_HOST);
 
 	var App = function (_React$Component) {
 		_inherits(App, _React$Component);
@@ -93,7 +93,6 @@
 			var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this));
 
 			_this.state = {
-				dataLength: 0,
 				inputSymbol: '',
 				stocks: [],
 				loading: true,
@@ -120,9 +119,16 @@
 				// need to fetch all stocks from server/API on page load and save to component state
 				socket.emit('init');
 				socket.on('inform-length', function (num) {
-					_this2.setState({
-						dataLength: num
-					});
+					if (num === 0) {
+						_this2.setState({
+							initialLoad: true,
+							dataLength: -1
+						});
+					} else {
+						_this2.setState({
+							dataLength: num
+						});
+					}
 				});
 				socket.on('init-stock', function (data) {
 					var stocks = _this2.state.stocks;
@@ -131,7 +137,7 @@
 					_this2.setState({
 						stocks: updatedStocks
 					});
-					if (updatedStocks.length === _this2.state.dataLength) {
+					if (updatedStocks.length === _this2.state.dataLength || _this2.state.dataLength === 0) {
 						_this2.setState({
 							loading: false,
 							initialLoad: false,
@@ -227,6 +233,13 @@
 							});
 						}
 					}
+				} else if (this.state.dataLength === -1) {
+					socket.emit('add', ticker);
+					this.setState({
+						initialLoad: false,
+						inputSymbol: '',
+						loading: true
+					});
 				}
 			}
 		}, {
@@ -305,7 +318,7 @@
 							inputSymbol: this.state.inputSymbol,
 							handleInput: this.handleInput,
 							addStock: this.addStock }),
-						this.state.loading && this.state.initialLoad && this.state.dataLength !== 0 && _react2.default.createElement(
+						this.state.loading && this.state.initialLoad && this.state.dataLength > 0 && _react2.default.createElement(
 							'p',
 							{ className: 'loadingMsg' },
 							'Please wait, currently loading ',
@@ -21945,7 +21958,7 @@
 				return _react2.default.createElement(
 					'div',
 					{ className: 'chartWrapper' },
-					!this.props.initStatus && _react2.default.createElement(_reactHighcharts2.default, { className: 'chart', config: config, ref: 'chart' })
+					!this.props.initStatus && chartData.length > 0 && _react2.default.createElement(_reactHighcharts2.default, { className: 'chart', config: config, ref: 'chart' })
 				);
 			}
 		}]);

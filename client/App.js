@@ -11,14 +11,13 @@ const DEV_HOST = 'http://localhost:7000';
 const PROD_HOST = 'https://blooming-ocean-10450.herokuapp.com';
 const HOST = PROD_HOST;
 
-const socket = io.connect(PROD_HOST);
+const socket = io.connect(DEV_HOST);
 
 class App extends React.Component {
 	constructor() {
 		super();
 
 		this.state = {
-			dataLength: 0,
 			inputSymbol: '',
 			stocks: [],
 			loading: true,
@@ -40,9 +39,16 @@ class App extends React.Component {
 		// need to fetch all stocks from server/API on page load and save to component state
 		socket.emit('init');
 		socket.on('inform-length', (num) => {
-			this.setState({
-				dataLength: num
-			});
+			if (num === 0) {
+				this.setState({
+					initialLoad: true,
+					dataLength: -1
+				})
+			} else {
+				this.setState({
+					dataLength: num
+				});
+			}
 		});
 		socket.on('init-stock', (data) => {
 			const { stocks } = this.state;
@@ -50,7 +56,7 @@ class App extends React.Component {
 			this.setState({
 				stocks: updatedStocks
 			});
-			if (updatedStocks.length === this.state.dataLength) {
+			if (updatedStocks.length === this.state.dataLength || this.state.dataLength === 0) {
 				this.setState({
 					loading: false,
 					initialLoad: false,
@@ -69,7 +75,7 @@ class App extends React.Component {
 			const updatedStocks = [...stocks, data];
 			this.setState({
 				stocks: updatedStocks,
-				loading: false
+				loading: false,
 			});
 		});
 
@@ -100,6 +106,7 @@ class App extends React.Component {
 		});
 	}
 	addStock() {
+
 		const { stocks, inputSymbol } = this.state;
 		const ticker = inputSymbol.trim().toUpperCase();
 		// make sure initla date is finished loading
@@ -129,6 +136,13 @@ class App extends React.Component {
 					});
 				}
 			}
+		} else if (this.state.dataLength === -1) {
+				socket.emit('add', ticker);
+				this.setState({
+					initialLoad: false,
+					inputSymbol: '',
+					loading: true
+				});
 		}
 	}
 	removeStock(ticker) {
@@ -172,7 +186,7 @@ class App extends React.Component {
 						handleInput = {this.handleInput}
 						addStock = {this.addStock} />
 
-					{ this.state.loading && this.state.initialLoad && this.state.dataLength !== 0 &&
+					{ this.state.loading && this.state.initialLoad && this.state.dataLength > 0 &&
 						<p className = 'loadingMsg'>Please wait, currently loading {this.state.stocks.length + 1} of {this.state.dataLength} stocks</p> }
 					
 					{ this.state.loading && !this.state.initialLoad &&
